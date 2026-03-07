@@ -44,6 +44,7 @@ export class ProcessPaymentApplicationService {
   constructor(
     private accountRepository: AccountRepository,
     private transferRepository: TransferRepository,
+    private transferDomainService: TransferDomainService,
     private notificationService: NotificationService
   ) {}
 
