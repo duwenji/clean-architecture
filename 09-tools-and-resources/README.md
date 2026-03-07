@@ -6,12 +6,12 @@
 
 ## 📚 セクション構成
 
-| カテゴリ | 用途 |
-|---------|------|
-| **フレームワーク** | Web, CLI, API開発 |
-| **DI/IoC Container** | 依存関係管理 |
-| **開発ツール** | 分析、テスト、ビルド |
-| **学習リソース** | 書籍、記事、コース |
+| # | カテゴリ | 内容 |
+|---|---------|---|
+| [01](./01-frameworks.md) | **フレームワーク** | Express, NestJS, Spring Boot, FastAPI 比較 |
+| [02](./02-di-containers.md) | **DI/IoC Container** | Type-DI, InversifyJS, Awilix, Spring DI |
+| [03](./03-development-tools.md) | **開発ツール** | Jest, Supertest, TestContainers, ESLint, madge, Snyk |
+| [04](./04-learning-resources.md) | **学習リソース** | 書籍、Udemy/Pluralsight、ブログ、GitHub、コミュニティ |
 
 ---
 
