@@ -150,11 +150,7 @@ Write-Host "🔄 EPUB 形式に変換中..." -ForegroundColor Cyan
 
 $epubOutput = Join-Path $outputDir "clean-architecture.epub"
 
-# 目次をコンパクトにするには 1 を使用（現在は 2）
-# 1: H1 のみ
-# 2: H1/H2
-# 3+: H1/H2/H3...
-$tocDepth = 1
+# 目次深度は metadata.yaml (toc-depth) を使用して一元管理する
 
 $pandocArgs = @()
 $pandocArgs += $files
@@ -166,8 +162,7 @@ $pandocArgs += @(
     "--standalone",
     "--output=$epubOutput",
     "--top-level-division=chapter",
-    "--table-of-contents",
-    "--toc-depth=$tocDepth"
+    "--table-of-contents"
 )
 
 try {
