@@ -16,6 +16,16 @@ $outputDir = Join-Path $scriptDir "output"
 $metadataFile = Join-Path $scriptDir "metadata.yaml"
 $styleFile = Join-Path $scriptDir "style.css"
 
+# UTF-8 BOM なしエンコーディング（共通）
+$Script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+
+# ============================================
+# タイトル解決ユーティリティ
+#   ファイル名スラグ → 表示タイトル変換
+#   README 目次用（番号付き）/ EPUB 見出し用（番号付き）/ 書籍本文用（番号なし）
+#   の 3 用途を下記の関数群で使い分ける
+# ============================================
+
 function Convert-SlugToTitle {
     param(
         [Parameter(Mandatory=$true)] [string]$Name
@@ -468,8 +478,7 @@ function New-BookManuscript {
     }
 
     $manuscriptPath = Join-Path ([System.IO.Path]::GetTempPath()) ("clean-architecture.manuscript.$([System.Guid]::NewGuid().ToString('N')).md")
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($manuscriptPath, ($manuscriptLines -join [Environment]::NewLine), $utf8NoBom)
+    [System.IO.File]::WriteAllText($manuscriptPath, ($manuscriptLines -join [Environment]::NewLine), $Script:Utf8NoBom)
     Write-Host "🛠 書籍用の一時原稿を生成: $manuscriptPath" -ForegroundColor Green
 
     return $manuscriptPath
@@ -577,46 +586,13 @@ function Update-ReadmeToc {
         1
     )
 
-    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($ReadmePath, $updatedReadme, $utf8NoBom)
+    [System.IO.File]::WriteAllText($ReadmePath, $updatedReadme, $Script:Utf8NoBom)
     Write-Host "📝 README の目次を更新: $ReadmePath" -ForegroundColor Green
 }
 
-# 出力フォルダを作成
-if (-not (Test-Path $outputDir)) {
-    New-Item -ItemType Directory -Path $outputDir | Out-Null
-    Write-Host "📁 出力フォルダを作成: $outputDir" -ForegroundColor Green
-}
-
-# フォルダ/ファイル構造から変換対象を生成
-$chapterEntries = Get-ChapterEntries -RootPath $projectRoot
-$files = Get-ConversionFiles -RootPath $projectRoot -ChapterEntries $chapterEntries
-
-if ($files.Count -eq 0) {
-    Write-Host "❌ エラー: 変換対象の markdown ファイルが見つかりません" -ForegroundColor Red
-    exit 1
-}
-
-# 走査結果と同じソースから README の目次も更新
-$readmePath = Join-Path $projectRoot 'README.md'
-$coverPath = Join-Path $projectRoot '00-COVER.md'
-Update-ReadmeToc -ReadmePath $readmePath -ChapterEntries $chapterEntries -CoverPath $coverPath
-
-$manuscriptPath = New-BookManuscript -RootPath $projectRoot -ChapterEntries $chapterEntries -CoverPath $coverPath
-
-# metadata.yaml が cover-image: null などを含むとPandocがopenBinaryFileエラーを出す場合があるためクリーンコピーを作成
-$effectiveMetadataFile = $metadataFile
-$hasNullCover = Select-String -Path $metadataFile -Pattern '^\s*(cover-image|epub-cover-image):\s*null\s*$' -Quiet
-if ($hasNullCover) {
-    $cleanLines = Get-Content $metadataFile | Where-Object { $_ -notmatch '^\s*(cover-image|epub-cover-image):\s*null\s*$' }
-    $effectiveMetadataFile = Join-Path $outputDir "metadata.cleaned.yaml"
-    $cleanLines | Set-Content -Path $effectiveMetadataFile -Encoding UTF8
-    Write-Host "ℹ️ メタデータファイルをクリーンコピーして処理: $effectiveMetadataFile" -ForegroundColor Yellow
-}
-
-Write-Host ""
-Write-Host "📚 処理するファイル数: $($files.Count)" -ForegroundColor Cyan
-Write-Host ""
+# ============================================
+# 前処理・検証ユーティリティ
+# ============================================
 
 function Test-ValidPath {
     param(
@@ -638,155 +614,224 @@ function Test-ValidPath {
     }
 }
 
-# Pandoc がインストールされているかチェック
-$pandocPath = Get-Command pandoc -ErrorAction SilentlyContinue
-if (-not $pandocPath) {
-    Write-Host "❌ エラー: Pandoc がインストールされていません" -ForegroundColor Red
-    Write-Host "   以下から Pandoc をダウンロードしてください:" -ForegroundColor Yellow
-    Write-Host "   https://pandoc.org/installing.html" -ForegroundColor Cyan
-    exit 1
+# ============================================
+# 変換処理
+# ============================================
+
+function Convert-ToEpub {
+    param(
+        [Parameter(Mandatory=$true)] [string]$ManuscriptPath,
+        [Parameter(Mandatory=$true)] [string]$EffectiveMetadataFile,
+        [Parameter(Mandatory=$true)] [string]$StyleFile,
+        [Parameter(Mandatory=$true)] [string]$EpubOutput
+    )
+
+    Write-Host "🔄 EPUB 形式に変換中..." -ForegroundColor Cyan
+
+    # 目次深度は metadata.yaml (toc-depth) を使用して一元管理する
+    $pandocArgs = @(
+        $ManuscriptPath,
+        "--from=markdown+auto_identifiers",
+        "--to=epub3",
+        "--metadata-file=$EffectiveMetadataFile",
+        "--css=$StyleFile",
+        "--standalone",
+        "--output=$EpubOutput",
+        "--top-level-division=chapter",
+        "--table-of-contents"
+    )
+
+    try {
+        & pandoc @pandocArgs
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ EPUB 作成成功: $EpubOutput" -ForegroundColor Green
+        } else {
+            Write-Host "❌ EPUB 作成失敗 (エラーコード: $LASTEXITCODE)" -ForegroundColor Red
+        }
+    } catch {
+        Write-Host "❌ EPUB 作成エラー: $_" -ForegroundColor Red
+    }
+
+    Write-Host ""
 }
 
-try {
-    Test-ValidPath -Path $metadataFile -Name 'metadata.yaml'
-    Test-ValidPath -Path $styleFile -Name 'style.css'
-    $files | ForEach-Object { Test-ValidPath -Path $_ -Name "入力ファイル" }
-    Test-ValidPath -Path $manuscriptPath -Name '一時原稿'
-} catch {
-    Write-Host "❌ ファイルパス検証エラー: $_" -ForegroundColor Red
-    exit 1
-}
+function Convert-ToAzw3 {
+    param(
+        [Parameter(Mandatory=$true)] [string]$EpubOutput,
+        [Parameter(Mandatory=$true)] [string]$Azw3Output,
+        [Parameter(Mandatory=$true)] $EbookConvert
+    )
 
-Write-Host "✅ Pandoc を検出しました: $(pandoc --version | Select-Object -First 1)" -ForegroundColor Green
-Write-Host ""
+    Write-Host "🔄 AZW3 形式に変換中..." -ForegroundColor Cyan
 
-# ============================================
-# 1. EPUB 形式に変換
-# ============================================
-Write-Host "🔄 EPUB 形式に変換中..." -ForegroundColor Cyan
+    if ($EbookConvert) {
+        try {
+            & ebook-convert $EpubOutput $Azw3Output `
+                --language ja `
+                --margin-left 0 `
+                --margin-right 0 `
+                --margin-top 0 `
+                --margin-bottom 0
 
-$epubOutput = Join-Path $outputDir "clean-architecture.epub"
-
-# 目次深度は metadata.yaml (toc-depth) を使用して一元管理する
-
-$pandocArgs = @()
-$pandocArgs += $manuscriptPath
-$pandocArgs += @(
-    "--from=markdown+auto_identifiers",
-    "--to=epub3",
-    "--metadata-file=$effectiveMetadataFile",
-    "--css=$styleFile",
-    "--standalone",
-    "--output=$epubOutput",
-    "--top-level-division=chapter",
-    "--table-of-contents"
-)
-
-try {
-    & pandoc @pandocArgs
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ EPUB 作成成功: $epubOutput" -ForegroundColor Green
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "✅ AZW3 作成成功: $Azw3Output" -ForegroundColor Green
+            } else {
+                Write-Host "❌ AZW3 作成失敗 (エラーコード: $LASTEXITCODE)" -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "⚠️  AZW3 作成エラー: $_" -ForegroundColor Yellow
+        }
     } else {
-        Write-Host "❌ EPUB 作成失敗 (エラーコード: $LASTEXITCODE)" -ForegroundColor Red
+        Write-Host "⚠️  ebook-convert が見つかりません (Calibre をインストールすれば AZW3 変換可)" -ForegroundColor Yellow
+        Write-Host "   https://calibre-ebook.com/download" -ForegroundColor Cyan
     }
-} catch {
-    Write-Host "❌ EPUB 作成エラー: $_" -ForegroundColor Red
+
+    Write-Host ""
 }
 
-Write-Host ""
+function Convert-ToMobi {
+    param(
+        [Parameter(Mandatory=$true)] [string]$EpubOutput,
+        [Parameter(Mandatory=$true)] [string]$MobiOutput,
+        [Parameter(Mandatory=$true)] $EbookConvert
+    )
 
-# ============================================
-# 2. Calibre (ebook-convert) で AZW3 に変換
-# ============================================
-Write-Host "🔄 AZW3 形式に変換中..." -ForegroundColor Cyan
+    Write-Host "🔄 MOBI 形式に変換中..." -ForegroundColor Cyan
 
-$azw3Output = Join-Path $outputDir "clean-architecture.azw3"
-$ebookConvert = Get-Command ebook-convert -ErrorAction SilentlyContinue
+    if ($EbookConvert) {
+        try {
+            & ebook-convert $EpubOutput $MobiOutput `
+                --language ja
 
-if ($ebookConvert) {
-    try {
-        & ebook-convert $epubOutput $azw3Output `
-            --language ja `
-            --margin-left 0 `
-            --margin-right 0 `
-            --margin-top 0 `
-            --margin-bottom 0
-        
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ AZW3 作成成功: $azw3Output" -ForegroundColor Green
-        } else {
-            Write-Host "⚠️  AZW3 作成スキップ (Calibreが見つかりません)" -ForegroundColor Yellow
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "✅ MOBI 作成成功: $MobiOutput" -ForegroundColor Green
+            } else {
+                Write-Host "⚠️  MOBI 作成スキップ (エラーコード: $LASTEXITCODE)" -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Host "⚠️  MOBI 作成エラー: $_" -ForegroundColor Yellow
         }
-    } catch {
-        Write-Host "⚠️  AZW3 作成スキップ: $_" -ForegroundColor Yellow
+    } else {
+        Write-Host "⚠️  MOBI 作成スキップ (Calibre が必要)" -ForegroundColor Yellow
     }
-} else {
-    Write-Host "⚠️  ebook-convert が見つかりません (Calibre をインストールすれば AZW3 変換可)" -ForegroundColor Yellow
-    Write-Host "   https://calibre-ebook.com/download" -ForegroundColor Cyan
+
+    Write-Host ""
 }
 
-Write-Host ""
-
 # ============================================
-# 3. MOBI 形式に変換（オプション）
+# エントリポイント
 # ============================================
-Write-Host "🔄 MOBI 形式に変換中..." -ForegroundColor Cyan
 
-$mobiOutput = Join-Path $outputDir "clean-architecture.mobi"
+function Main {
+    # 出力フォルダを作成
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Path $outputDir | Out-Null
+        Write-Host "📁 出力フォルダを作成: $outputDir" -ForegroundColor Green
+    }
 
-if ($ebookConvert) {
+    # フォルダ/ファイル構造から変換対象を生成
+    $chapterEntries = Get-ChapterEntries -RootPath $projectRoot
+    $files = Get-ConversionFiles -RootPath $projectRoot -ChapterEntries $chapterEntries
+
+    if ($files.Count -eq 0) {
+        Write-Host "❌ エラー: 変換対象の markdown ファイルが見つかりません" -ForegroundColor Red
+        exit 1
+    }
+
+    # 走査結果と同じソースから README の目次も更新
+    $readmePath = Join-Path $projectRoot 'README.md'
+    $coverPath = Join-Path $projectRoot '00-COVER.md'
+    Update-ReadmeToc -ReadmePath $readmePath -ChapterEntries $chapterEntries -CoverPath $coverPath
+
+    $manuscriptPath = New-BookManuscript -RootPath $projectRoot -ChapterEntries $chapterEntries -CoverPath $coverPath
+
+    # metadata.yaml が cover-image: null などを含むとPandocがopenBinaryFileエラーを出す場合があるためクリーンコピーを作成
+    $effectiveMetadataFile = $metadataFile
+    $hasNullCover = Select-String -Path $metadataFile -Pattern '^\s*(cover-image|epub-cover-image):\s*null\s*$' -Quiet
+    if ($hasNullCover) {
+        $cleanLines = Get-Content $metadataFile | Where-Object { $_ -notmatch '^\s*(cover-image|epub-cover-image):\s*null\s*$' }
+        $effectiveMetadataFile = Join-Path $outputDir "metadata.cleaned.yaml"
+        $cleanLines | Set-Content -Path $effectiveMetadataFile -Encoding UTF8
+        Write-Host "ℹ️ メタデータファイルをクリーンコピーして処理: $effectiveMetadataFile" -ForegroundColor Yellow
+    }
+
+    Write-Host ""
+    Write-Host "📚 処理するファイル数: $($files.Count)" -ForegroundColor Cyan
+    Write-Host ""
+
+    # Pandoc がインストールされているかチェック
+    $pandocPath = Get-Command pandoc -ErrorAction SilentlyContinue
+    if (-not $pandocPath) {
+        Write-Host "❌ エラー: Pandoc がインストールされていません" -ForegroundColor Red
+        Write-Host "   以下から Pandoc をダウンロードしてください:" -ForegroundColor Yellow
+        Write-Host "   https://pandoc.org/installing.html" -ForegroundColor Cyan
+        exit 1
+    }
+
     try {
-        & ebook-convert $epubOutput $mobiOutput `
-            --language ja
-        
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ MOBI 作成成功: $mobiOutput" -ForegroundColor Green
-        } else {
-            Write-Host "⚠️  MOBI 作成スキップ" -ForegroundColor Yellow
-        }
+        Test-ValidPath -Path $metadataFile -Name 'metadata.yaml'
+        Test-ValidPath -Path $styleFile -Name 'style.css'
+        $files | ForEach-Object { Test-ValidPath -Path $_ -Name "入力ファイル" }
+        Test-ValidPath -Path $manuscriptPath -Name '一時原稿'
     } catch {
-        Write-Host "⚠️  MOBI 作成スキップ: $_" -ForegroundColor Yellow
+        Write-Host "❌ ファイルパス検証エラー: $_" -ForegroundColor Red
+        exit 1
     }
-} else {
-    Write-Host "⚠️  MOBI 作成スキップ (Calibre が必要)" -ForegroundColor Yellow
+
+    Write-Host "✅ Pandoc を検出しました: $(pandoc --version | Select-Object -First 1)" -ForegroundColor Green
+    Write-Host ""
+
+    $epubOutput = Join-Path $outputDir "clean-architecture.epub"
+    $azw3Output = Join-Path $outputDir "clean-architecture.azw3"
+    $mobiOutput = Join-Path $outputDir "clean-architecture.mobi"
+    $ebookConvert = Get-Command ebook-convert -ErrorAction SilentlyContinue
+
+    Convert-ToEpub -ManuscriptPath $manuscriptPath -EffectiveMetadataFile $effectiveMetadataFile -StyleFile $styleFile -EpubOutput $epubOutput
+    Convert-ToAzw3 -EpubOutput $epubOutput -Azw3Output $azw3Output -EbookConvert $ebookConvert
+    Convert-ToMobi -EpubOutput $epubOutput -MobiOutput $mobiOutput -EbookConvert $ebookConvert
+
+    # ============================================
+    # 完了報告
+    # ============================================
+    $separator = '=' * 60
+    Write-Host $separator -ForegroundColor Cyan
+    Write-Host "✅ 変換処理が完了しました" -ForegroundColor Green
+    Write-Host $separator -ForegroundColor Cyan
+
+    Write-Host ""
+    Write-Host "📦 生成されたファイル:" -ForegroundColor Cyan
+    $outputs = @(
+        Get-ChildItem $outputDir -Filter '*.epub' -File -ErrorAction SilentlyContinue
+        Get-ChildItem $outputDir -Filter '*.azw3' -File -ErrorAction SilentlyContinue
+        Get-ChildItem $outputDir -Filter '*.mobi' -File -ErrorAction SilentlyContinue
+    )
+
+    if ($outputs -and $outputs.Count -gt 0) {
+        $outputs | ForEach-Object {
+            $sizeKB = [math]::Round($_.Length / 1KB, 2)
+            Write-Host "  ✓ $($_.Name) ($sizeKB KB)" -ForegroundColor Green
+        }
+    } else {
+        Write-Host "  (出力フォルダを確認してください)" -ForegroundColor Yellow
+    }
+
+    Write-Host ""
+    Write-Host "📂 出力フォルダ: $outputDir" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "📖 次のステップ:" -ForegroundColor Cyan
+    Write-Host "  1. EPUB ファイルで内容確認"
+    Write-Host "  2. Kindle互換性チェック (KINDLE-COMPATIBILITY-CHECKLIST.md 参照)"
+    Write-Host "  3. AZW3 を Kindle デバイスに転送"
+    Write-Host ""
+
+    # 出力フォルダをエクスプローラーで開く
+    if ($outputs) {
+        Write-Host "📂 出力フォルダを開きますか? (Y/n)" -ForegroundColor Cyan
+        $response = Read-Host
+        if ($response -ne 'n' -and $response -ne 'N') {
+            Invoke-Item $outputDir
+        }
+    }
 }
 
-Write-Host ""
-
-# ============================================
-# 完了報告
-# ============================================
-Write-Host "=" * 60 -ForegroundColor Cyan
-Write-Host "✅ 変換処理が完了しました" -ForegroundColor Green
-Write-Host "=" * 60
-
-Write-Host ""
-Write-Host "📦 生成されたファイル:" -ForegroundColor Cyan
-$outputs = Get-ChildItem $outputDir -Include '*.epub','*.azw3','*.mobi' -File -ErrorAction SilentlyContinue
-
-if ($outputs -and $outputs.Count -gt 0) {
-    $outputs | ForEach-Object {
-        $sizeKB = [math]::Round($_.Length / 1KB, 2)
-        Write-Host "  ✓ $($_.Name) ($sizeKB KB)" -ForegroundColor Green
-    }
-} else {
-    Write-Host "  (出力フォルダを確認してください)" -ForegroundColor Yellow
-}
-
-Write-Host ""
-Write-Host "📂 出力フォルダ: $outputDir" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "📖 次のステップ:" -ForegroundColor Cyan
-Write-Host "  1. EPUB ファイルで内容確認"
-Write-Host "  2. Kindle互換性チェック (KINDLE-COMPATIBILITY-CHECKLIST.md 参照)"
-Write-Host "  3. AZW3 を Kindle デバイスに転送"
-Write-Host ""
-
-# 出力フォルダをエクスプローラーで開く
-if ($outputs) {
-    Write-Host "📂 出力フォルダを開きますか? (Y/n)" -ForegroundColor Cyan
-    $response = Read-Host
-    if ($response -ne 'n' -and $response -ne 'N') {
-        Invoke-Item $outputDir
-    }
-}
+Main
