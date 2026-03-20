@@ -53,3 +53,4 @@ cd c:\dev\apps\clean-architecture
 
 - `enablePageList` is enabled by default in the Skill configuration.
 - Final artifacts are written to `ebook-output/`.
+- Regenerated files under `ebook-output/` are treated as reviewable build artifacts and should be included in commits when the source content, metadata, styles, or build flow changes.

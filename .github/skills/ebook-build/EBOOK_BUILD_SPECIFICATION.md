@@ -2,7 +2,7 @@
 
 ## Goal
 
-Provide a reusable, agent-friendly, self-contained ebook build workflow for clean-architecture.
+Provide a reusable, agent-friendly, self-contained ebook build workflow for markdown repositories that follow numbered chapter conventions.
 
 ## Source Discovery
 
@@ -17,32 +17,32 @@ Given `sourceRoot`:
 - Chapter directories: `chapterDirPattern` (default `^\\d{2}-`)
 - Section markdown files: `chapterFilePattern` (default `^\\d{2}-.*\\.md$`)
 - Cover file: `coverFile` (default `00-COVER.md`, optional)
-- Root `README.md`: optional, copied into staging when present so the converter can refresh AUTO-TOC safely
+- Root `README.md`: optional, copied into staging when present so converter-side TOC updates remain safe
 
 ## Staging Contract
 
 The runner creates an isolated temporary workspace:
 
-- `temp/book/`                      staged source root
-- `temp/book/kindle/`               staged conversion scripts + metadata + stylesheet
-- `temp/book/kindle/output/`        intermediate outputs
+- `temp/book/` staged source root
+- `temp/book/kindle/` staged conversion scripts, metadata, and stylesheet
+- `temp/book/kindle/output/` intermediate outputs
 
 ## Build Steps
 
-1. Validate required toolchain and configured file paths.
-2. Stage source markdown content from the detected content root.
-3. Copy `scripts/convert-to-kindle.ps1` into the staging area.
-4. Copy `scripts/add-pagelist-functions.ps1` into the staging area when available.
-5. Copy skill-scoped metadata and stylesheet files into the staging area.
-6. Patch the staged converter for non-interactive execution.
-7. Run the staged converter.
-8. Copy selected format outputs into `outputDir` using `projectName` as the filename base.
-9. Clean the temporary workspace unless `preserveTemp` is enabled.
+1. Resolve configuration values from command-line parameters, config file, and defaults.
+2. Validate required file paths and discover the effective content root.
+3. Stage chapter content, optional cover, and optional root `README.md`.
+4. Stage converter scripts, metadata, and stylesheet.
+5. Patch the staged converter for non-interactive execution.
+6. Run the staged converter.
+7. Copy requested artifacts to `outputDir` using `projectName` as the filename base.
+8. Fail if no requested artifacts were copied.
+9. Clean temporary workspace unless `preserveTemp` is enabled.
 
 ## Page-List Behavior
 
-- `enablePageList: true` is the clean-architecture Skill default.
-- If `enablePageList: true` but `add-pagelist-functions.ps1` is not found in `kindleTemplateDir`, the runner logs a warning and continues with page-list disabled.
+- Default behavior is controlled by `enablePageList`.
+- If `enablePageList: true` and `add-pagelist-functions.ps1` is missing, the runner logs a warning and continues with page-list disabled.
 
 ## Format Behavior
 
@@ -57,11 +57,11 @@ Missing optional formats produce warnings, not hard failures.
 Hard fail:
 
 - source root not found
-- metadata or stylesheet file not found
-- conversion core script missing
+- metadata or stylesheet not found
+- core conversion script missing
 - no chapter content found
 - staged converter exits with non-zero status
-- no requested artifacts copied to the output directory
+- no requested artifacts copied to output directory
 
 Soft warnings:
 
@@ -70,4 +70,10 @@ Soft warnings:
 
 ## Reuse Scope
 
-Reusable for repositories that satisfy the chapter contract and either use the bundled conversion scripts or override them with a compatible PowerShell conversion core.
+Reusable across repositories that satisfy the chapter contract and provide project-specific config + metadata.
+
+Project-specific responsibilities:
+
+- maintain each project's `configs/*.build.json`
+- maintain each project's `configs/*.metadata.yaml`
+- keep `projectName`, `sourceRoot`, and output policy aligned with repository layout

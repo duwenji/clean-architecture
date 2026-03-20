@@ -46,7 +46,6 @@ function Resolve-Value {
         [hashtable]$Config,
         [hashtable]$Bound
     )
-
     if ($Bound.ContainsKey($Name)) {
         return $CurrentValue
     }
@@ -73,6 +72,28 @@ function Resolve-ConfiguredPath {
     }
 
     return Join-Path $RepoRoot $PathValue
+}
+
+function Resolve-DefaultMetadataFile {
+    param(
+        [string]$RepoRoot,
+        [string]$ProjectName
+    )
+
+    $metadataDir = Join-Path $RepoRoot '.github\skills\ebook-build\configs'
+    $projectCandidate = Join-Path $metadataDir ("$ProjectName.metadata.yaml")
+
+    if (Test-Path $projectCandidate) {
+        return $projectCandidate
+    }
+
+    $metadataCandidates = @(Get-ChildItem -Path $metadataDir -File -Filter '*.metadata.yaml' -ErrorAction SilentlyContinue | Sort-Object Name)
+    if ($metadataCandidates.Count -eq 1) {
+        Write-Warning "Project metadata not found at $projectCandidate. Falling back to $($metadataCandidates[0].FullName)."
+        return $metadataCandidates[0].FullName
+    }
+
+    return $projectCandidate
 }
 
 function Resolve-ContentRoot {
@@ -113,13 +134,9 @@ $config = Get-ConfigMap -Path $ConfigFile
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..\..')).ProviderPath
 $defaultKindleTemplateDir = $PSScriptRoot
-$defaultMetadataFile = Join-Path $repoRoot '.github\skills\ebook-build\configs\clean-architecture.metadata.yaml'
-$defaultStyleFile = Join-Path $repoRoot '.github\skills\ebook-build\assets\style.css'
 
 $SourceRoot = Resolve-Value -Name 'SourceRoot' -CurrentValue $SourceRoot -DefaultValue $repoRoot -Config $config -Bound $scriptBound
 $KindleTemplateDir = Resolve-Value -Name 'KindleTemplateDir' -CurrentValue $KindleTemplateDir -DefaultValue $defaultKindleTemplateDir -Config $config -Bound $scriptBound
-$MetadataFile = Resolve-Value -Name 'MetadataFile' -CurrentValue $MetadataFile -DefaultValue $defaultMetadataFile -Config $config -Bound $scriptBound
-$StyleFile = Resolve-Value -Name 'StyleFile' -CurrentValue $StyleFile -DefaultValue $defaultStyleFile -Config $config -Bound $scriptBound
 $ChapterDirPattern = Resolve-Value -Name 'ChapterDirPattern' -CurrentValue $ChapterDirPattern -DefaultValue '^\d{2}-' -Config $config -Bound $scriptBound
 $ChapterFilePattern = Resolve-Value -Name 'ChapterFilePattern' -CurrentValue $ChapterFilePattern -DefaultValue '^\d{2}-.*\.md$' -Config $config -Bound $scriptBound
 $CoverFile = Resolve-Value -Name 'CoverFile' -CurrentValue $CoverFile -DefaultValue '00-COVER.md' -Config $config -Bound $scriptBound
@@ -135,11 +152,8 @@ if (-not $Formats -or $Formats.Count -eq 0) {
     }
 }
 $Formats = @($Formats | ForEach-Object { $_.ToString().ToLowerInvariant() } | Select-Object -Unique)
-
 $SourceRoot = Resolve-ConfiguredPath -PathValue $SourceRoot -RepoRoot $repoRoot
 $KindleTemplateDir = Resolve-ConfiguredPath -PathValue $KindleTemplateDir -RepoRoot $repoRoot
-$MetadataFile = Resolve-ConfiguredPath -PathValue $MetadataFile -RepoRoot $repoRoot
-$StyleFile = Resolve-ConfiguredPath -PathValue $StyleFile -RepoRoot $repoRoot
 
 $resolvedSourceRoot = (Resolve-Path $SourceRoot).ProviderPath
 if (-not $ProjectName) {
@@ -149,6 +163,13 @@ if (-not $ProjectName) {
         $ProjectName = Split-Path -Leaf $resolvedSourceRoot
     }
 }
+
+$defaultMetadataFile = Resolve-DefaultMetadataFile -RepoRoot $repoRoot -ProjectName $ProjectName
+$defaultStyleFile = Join-Path $repoRoot '.github\skills\ebook-build\assets\style.css'
+$MetadataFile = Resolve-Value -Name 'MetadataFile' -CurrentValue $MetadataFile -DefaultValue $defaultMetadataFile -Config $config -Bound $scriptBound
+$StyleFile = Resolve-Value -Name 'StyleFile' -CurrentValue $StyleFile -DefaultValue $defaultStyleFile -Config $config -Bound $scriptBound
+$MetadataFile = Resolve-ConfiguredPath -PathValue $MetadataFile -RepoRoot $repoRoot
+$StyleFile = Resolve-ConfiguredPath -PathValue $StyleFile -RepoRoot $repoRoot
 
 if (-not $OutputDir) {
     if ($config.ContainsKey('outputDir') -and -not [string]::IsNullOrWhiteSpace([string]$config['outputDir'])) {
@@ -186,7 +207,7 @@ if (-not (Test-Path $OutputDir)) {
     New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 }
 
-$tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('ebook-build-' + [Guid]::NewGuid().ToString('N'))
+$tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("ebook-build-" + [Guid]::NewGuid().ToString('N'))
 $stageBookRoot = Join-Path $tempRoot 'book'
 $stageKindle = Join-Path $stageBookRoot 'kindle'
 $stageOutput = Join-Path $stageKindle 'output'

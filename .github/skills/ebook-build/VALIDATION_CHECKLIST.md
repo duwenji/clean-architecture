@@ -12,6 +12,7 @@
 - [ ] AZW3 output exists or a clear warning is shown
 - [ ] MOBI output exists or a clear warning is shown
 - [ ] Output filenames use `projectName` as the base name
+- [ ] At least one requested artifact is copied to output
 
 ## Structural Quality
 
@@ -20,11 +21,16 @@
 - [ ] Heading hierarchy is readable
 - [ ] Code blocks render correctly
 
-## Repository-Specific Quality
+## Repository Integrity
 
 - [ ] Cover file is included when `00-COVER.md` exists
-- [ ] `README.md` AUTO-TOC remains valid in the source repository
+- [ ] Root `README.md` remains valid after TOC refresh (when present)
 - [ ] Chapter order matches numbered folders and files
+
+## EPUB Optional Feature
+
+- [ ] Page-list step runs when `enablePageList` is true and helper script exists
+- [ ] If helper script is missing, warning is logged and build still succeeds
 
 ## Compatibility
 
