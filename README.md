@@ -15,23 +15,63 @@
 
 ## 📚 ガイド構成（表紙 + 本編9章）
 
-### 表紙（章外）
-| セクション | 内容 | 状態 |
-|-----------|------|------|
-| [00-COVER](./00-COVER.md) | ガイド全体の概要と学習導線 | ✅ |
+この目次はフォルダ/ファイル構造から自動生成されます。
 
-### 本編（全9章）
-| 章 | セクション | 内容 | 学習時間 | 状態 |
-|---|---|---|---|---|
-| 1 | [01. 導入](./01-introduction/) | クリーンアーキテクチャとは何か、なぜ必要か | 30分 | ✅ |
-| 2 | [02. SOLID原則](./02-core-principles/) | 設計の5つの基本原則 | 1時間 | ✅ |
-| 3 | [03. アーキテクチャ層](./03-architecture-layers/) | 4層構造の詳細 | 1時間 | ✅ |
-| 4 | [04. デザインパターン](./04-design-patterns/) | 依存性注入、リポジトリパターンなど | 1.5時間 | ✅ |
-| 5 | [05. 実装ガイド](./05-implementation-guide/) | プロジェクト構造と実装方法 | 2時間 | ✅ |
-| 6 | [06. ベストプラクティス](./06-best-practices/) | 命名規則、エラーハンドリング、セキュリティ | 1.5時間 | ✅ |
-| 7 | [07. よくある間違い](./07-common-pitfalls/) | 陥りやすいアンチパターン | 30分 | ✅ |
-| 8 | [08. ケーススタディ](./08-case-studies/) | 実世界の実装例（EC、SNS、マイクロサービス） | 1時間 | ✅ |
-| 9 | [09. ツール・リソース](./09-tools-and-resources/) | 推奨ツール、フレームワーク、学習リソース | 30分 | ✅ |
+- 生成元: `kindle/convert-to-kindle.ps1`
+- 対象フォルダ: `^\d{2}-`
+- 対象ファイル: `^\d{2}-.*\.md`（`README.md`は除外）
+
+<!-- AUTO-TOC:START -->
+- [00. Cover](./00-COVER.md)
+- [01. Introduction](./01-introduction/)
+  - [01. Overview](./01-introduction/01-overview.md)
+  - [02. Why Clean Architecture](./01-introduction/02-why-clean-architecture.md)
+  - [03. Key Concepts](./01-introduction/03-key-concepts.md)
+- [02. Core Principles](./02-core-principles/)
+  - [01. Single Responsibility](./02-core-principles/01-single-responsibility.md)
+  - [02. Open Closed](./02-core-principles/02-open-closed.md)
+  - [03. Liskov Substitution](./02-core-principles/03-liskov-substitution.md)
+  - [04. Interface Segregation](./02-core-principles/04-interface-segregation.md)
+  - [05. Dependency Inversion](./02-core-principles/05-dependency-inversion.md)
+- [03. Architecture Layers](./03-architecture-layers/)
+  - [01. Presentation Layer](./03-architecture-layers/01-presentation-layer.md)
+  - [02. Application Layer](./03-architecture-layers/02-application-layer.md)
+  - [03. Domain Layer](./03-architecture-layers/03-domain-layer.md)
+  - [04. Infrastructure Layer](./03-architecture-layers/04-infrastructure-layer.md)
+  - [05. Layer Dependencies](./03-architecture-layers/05-layer-dependencies.md)
+- [04. Design Patterns](./04-design-patterns/)
+  - [01. Dependency Injection](./04-design-patterns/01-dependency-injection.md)
+  - [02. Repository Pattern](./04-design-patterns/02-repository-pattern.md)
+  - [03. Service Pattern](./04-design-patterns/03-service-pattern.md)
+  - [04. DTO Pattern](./04-design-patterns/04-dto-pattern.md)
+  - [05. Adapter Pattern](./04-design-patterns/05-adapter-pattern.md)
+- [05. Implementation Guide](./05-implementation-guide/)
+  - [01. Project Structure](./05-implementation-guide/01-project-structure.md)
+  - [02. Entity Design](./05-implementation-guide/02-entity-design.md)
+  - [03. Use Case Design](./05-implementation-guide/03-usecase-design.md)
+  - [04. Implementation Example](./05-implementation-guide/04-implementation-example.md)
+  - [05. Testing Strategy](./05-implementation-guide/05-testing-strategy.md)
+- [06. Best Practices](./06-best-practices/)
+  - [01. Naming Conventions](./06-best-practices/01-naming-conventions.md)
+  - [02. Error Handling](./06-best-practices/02-error-handling.md)
+  - [03. Logging Monitoring](./06-best-practices/03-logging-monitoring.md)
+  - [04. Performance Optimization](./06-best-practices/04-performance-optimization.md)
+  - [05. Security](./06-best-practices/05-security.md)
+- [07. Common Pitfalls](./07-common-pitfalls/)
+  - [01. Over Engineering](./07-common-pitfalls/01-over-engineering.md)
+  - [02. Tight Coupling](./07-common-pitfalls/02-tight-coupling.md)
+  - [03. Anemic Model](./07-common-pitfalls/03-anemic-model.md)
+  - [04. Circular Dependency](./07-common-pitfalls/04-circular-dependency.md)
+- [08. Case Studies](./08-case-studies/)
+  - [01. Ecommerce Site](./08-case-studies/01-ecommerce-site.md)
+  - [02. SNS Platform](./08-case-studies/02-sns-platform.md)
+  - [03. Microservices](./08-case-studies/03-microservices.md)
+- [09. Tools and Resources](./09-tools-and-resources/)
+  - [01. Frameworks](./09-tools-and-resources/01-frameworks.md)
+  - [02. DI Containers](./09-tools-and-resources/02-di-containers.md)
+  - [03. Development Tools](./09-tools-and-resources/03-development-tools.md)
+  - [04. Learning Resources](./09-tools-and-resources/04-learning-resources.md)
+<!-- AUTO-TOC:END -->
 
 ---
 
@@ -39,7 +79,7 @@
 
 - Kindle 出力の目次は `kindle/convert-to-kindle.ps1` の Pandoc 自動生成を正とします。
 - `00-COVER.md` には手動の章一覧テーブルを置かず、見出し構造で目次を表現します。
-- 章の追加・改名時は、`kindle/convert-to-kindle.ps1` の `$files` 配列を更新してください。
+- 章フォルダ/章内ファイルの追加・改名は、命名規則（`^\d{2}-`）に従えば README 目次と変換順に自動反映されます。
 - 目次の深さは `kindle/metadata.yaml` の `toc-depth` で管理します。
 
 ---
@@ -318,3 +358,4 @@ Part 3: 実践知識         [████████████████] 
 **次: [表紙で全体像を確認 →](./00-COVER.md)** または **[クリーンアーキテクチャ概要を学ぶ →](./01-introduction/01-overview.md)**
 
 ---
+

@@ -16,77 +16,565 @@ $outputDir = Join-Path $scriptDir "output"
 $metadataFile = Join-Path $scriptDir "metadata.yaml"
 $styleFile = Join-Path $scriptDir "style.css"
 
+function Convert-SlugToTitle {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Name
+    )
+
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($Name)
+    $baseName = $baseName -replace '^\d{2}-', ''
+    $baseName = $baseName -replace '\busecase\b', 'use case'
+    $baseName = $baseName -replace '[_-]+', ' '
+    $baseName = ($baseName -replace '\s+', ' ').Trim()
+
+    if ([string]::IsNullOrWhiteSpace($baseName)) {
+        return ""
+    }
+
+    $textInfo = (Get-Culture).TextInfo
+    $wordOverrides = @{
+        'cover' = 'Cover'
+        'di' = 'DI'
+        'dto' = 'DTO'
+        'sns' = 'SNS'
+    }
+    $lowercaseWords = @('a', 'an', 'and', 'for', 'in', 'of', 'on', 'or', 'the', 'to')
+
+    $words = @()
+    $wordIndex = 0
+    foreach ($word in $baseName.Split(' ')) {
+        if ([string]::IsNullOrWhiteSpace($word)) {
+            continue
+        }
+
+        $normalizedWord = $word.ToLowerInvariant()
+        if ($wordOverrides.ContainsKey($normalizedWord)) {
+            $words += $wordOverrides[$normalizedWord]
+        }
+        elseif ($wordIndex -gt 0 -and $lowercaseWords -contains $normalizedWord) {
+            $words += $normalizedWord
+        }
+        elseif ($word.Length -le 2 -and $word -cmatch '^[A-Za-z]+$') {
+            $words += $word.ToUpperInvariant()
+        }
+        elseif ($word -cmatch '^[A-Z0-9]+$') {
+            $words += $word
+        }
+        else {
+            $words += $textInfo.ToTitleCase($normalizedWord)
+        }
+
+        $wordIndex += 1
+    }
+
+    return ($words -join ' ')
+}
+
+function Get-MarkdownH1Title {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Path
+    )
+
+    if (-not (Test-Path $Path)) {
+        return $null
+    }
+
+    $headingLine = Get-Content -Path $Path -Encoding UTF8 |
+        Where-Object { $_ -match '^\s*#\s+(.+)$' } |
+        Select-Object -First 1
+
+    if ($headingLine) {
+        return ($headingLine -replace '^\s*#\s+', '').Trim()
+    }
+
+    return $null
+}
+
+function Get-NumberedDisplayTitle {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Name,
+        [string]$MarkdownPath
+    )
+
+    $prefix = ""
+    if ($Name -match '^(\d{2})-') {
+        $prefix = "$($Matches[1]). "
+    }
+
+    $title = Convert-SlugToTitle -Name $Name
+    if (([string]::IsNullOrWhiteSpace($title) -or $title.Length -lt 3) -and $MarkdownPath) {
+        $h1Title = Get-MarkdownH1Title -Path $MarkdownPath
+        if (-not [string]::IsNullOrWhiteSpace($h1Title)) {
+            $title = $h1Title
+        }
+    }
+
+    if ([string]::IsNullOrWhiteSpace($title)) {
+        $title = [System.IO.Path]::GetFileNameWithoutExtension($Name)
+    }
+
+    return "$prefix$title"
+}
+
+function Remove-LeadingNumberMarker {
+    param(
+        [AllowNull()] [string]$Title
+    )
+
+    if ($null -eq $Title) {
+        return $null
+    }
+
+    $normalizedTitle = $Title.Trim()
+    if ([string]::IsNullOrWhiteSpace($normalizedTitle)) {
+        return $normalizedTitle
+    }
+
+    $normalizedTitle = $normalizedTitle -replace '^\s*\d{1,2}\s*(?:[\.\-:：]\s*|\)\s+)', ''
+    return $normalizedTitle.Trim()
+}
+
+function Get-BookDisplayTitle {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Name,
+        [string]$MarkdownPath
+    )
+
+    $title = $null
+
+    if ($MarkdownPath) {
+        $title = Remove-LeadingNumberMarker -Title (Get-MarkdownH1Title -Path $MarkdownPath)
+    }
+
+    if ([string]::IsNullOrWhiteSpace($title)) {
+        $title = Remove-LeadingNumberMarker -Title (Convert-SlugToTitle -Name $Name)
+    }
+
+    if ([string]::IsNullOrWhiteSpace($title)) {
+        $title = Remove-LeadingNumberMarker -Title ([System.IO.Path]::GetFileNameWithoutExtension($Name))
+    }
+
+    return $title
+}
+
+function Get-ChapterReadmePath {
+    param(
+        [Parameter(Mandatory=$true)] [System.IO.DirectoryInfo]$ChapterDirectory
+    )
+
+    $chapterReadmePath = Join-Path $ChapterDirectory.FullName 'README.md'
+    if (Test-Path $chapterReadmePath) {
+        return $chapterReadmePath
+    }
+
+    return $null
+}
+
+function Get-BookChapterTitle {
+    param(
+        [Parameter(Mandatory=$true)] $ChapterEntry
+    )
+
+    $chapterReadmePath = Get-ChapterReadmePath -ChapterDirectory $ChapterEntry.Directory
+    return Get-BookDisplayTitle -Name $ChapterEntry.Directory.Name -MarkdownPath $chapterReadmePath
+}
+
+function Get-BookSectionTitle {
+    param(
+        [Parameter(Mandatory=$true)] [System.IO.FileInfo]$ChapterFile
+    )
+
+    return Get-BookDisplayTitle -Name $ChapterFile.Name -MarkdownPath $ChapterFile.FullName
+}
+
+function New-AnchorId {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Prefix,
+        [Parameter(Mandatory=$true)] [string[]]$Segments
+    )
+
+    $normalizedSegments = @()
+    foreach ($segment in $Segments) {
+        if ([string]::IsNullOrWhiteSpace($segment)) {
+            continue
+        }
+
+        $normalizedSegment = $segment.ToLowerInvariant()
+        $normalizedSegment = $normalizedSegment -replace '\.md$', ''
+        $normalizedSegment = $normalizedSegment -replace '[^a-z0-9]+', '-'
+        $normalizedSegment = $normalizedSegment.Trim('-')
+
+        if (-not [string]::IsNullOrWhiteSpace($normalizedSegment)) {
+            $normalizedSegments += $normalizedSegment
+        }
+    }
+
+    if ($normalizedSegments.Count -eq 0) {
+        $normalizedSegments = @([System.Guid]::NewGuid().ToString('N'))
+    }
+
+    return "$Prefix-$($normalizedSegments -join '-')"
+}
+
+function Get-CoverAnchorId {
+    return New-AnchorId -Prefix 'cover' -Segments @('00-COVER')
+}
+
+function Get-ChapterAnchorId {
+    param(
+        [Parameter(Mandatory=$true)] $ChapterEntry
+    )
+
+    return New-AnchorId -Prefix 'chapter' -Segments @($ChapterEntry.Directory.Name)
+}
+
+function Get-SectionAnchorId {
+    param(
+        [Parameter(Mandatory=$true)] [System.IO.FileInfo]$ChapterFile
+    )
+
+    return New-AnchorId -Prefix 'section' -Segments @((Split-Path -Leaf $ChapterFile.DirectoryName), $ChapterFile.BaseName)
+}
+
+function Get-NormalizedPathKey {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Path
+    )
+
+    return $Path.TrimEnd([char[]]@('\', '/')).ToLowerInvariant()
+}
+
+function New-BookLinkMap {
+    param(
+        [Parameter(Mandatory=$true)] [array]$ChapterEntries,
+        [Parameter(Mandatory=$true)] [string]$CoverPath
+    )
+
+    $linkMap = @{}
+    if (Test-Path $CoverPath) {
+        $linkMap[(Get-NormalizedPathKey -Path (Resolve-Path $CoverPath -ErrorAction Stop).ProviderPath)] = "#$(Get-CoverAnchorId)"
+    }
+
+    foreach ($chapter in $ChapterEntries) {
+        $chapterAnchor = "#$(Get-ChapterAnchorId -ChapterEntry $chapter)"
+        $linkMap[(Get-NormalizedPathKey -Path $chapter.Directory.FullName)] = $chapterAnchor
+
+        $chapterReadmePath = Get-ChapterReadmePath -ChapterDirectory $chapter.Directory
+        if ($chapterReadmePath) {
+            $linkMap[(Get-NormalizedPathKey -Path (Resolve-Path $chapterReadmePath -ErrorAction Stop).ProviderPath)] = $chapterAnchor
+        }
+
+        foreach ($chapterFile in $chapter.Files) {
+            $linkMap[(Get-NormalizedPathKey -Path (Resolve-Path $chapterFile.FullName -ErrorAction Stop).ProviderPath)] = "#$(Get-SectionAnchorId -ChapterFile $chapterFile)"
+        }
+    }
+
+    return $linkMap
+}
+
+function Resolve-LocalLinkPath {
+    param(
+        [Parameter(Mandatory=$true)] [string]$SourcePath,
+        [Parameter(Mandatory=$true)] [string]$LinkTarget
+    )
+
+    if ([string]::IsNullOrWhiteSpace($LinkTarget) -or $LinkTarget.StartsWith('#')) {
+        return $null
+    }
+
+    if ($LinkTarget -match '^(?:https?|mailto|tel):') {
+        return $null
+    }
+
+    $pathPart = $LinkTarget
+    if ($LinkTarget -match '^(?<path>[^#]+)#.+$') {
+        $pathPart = $Matches['path']
+    }
+
+    if ([string]::IsNullOrWhiteSpace($pathPart)) {
+        return $null
+    }
+
+    $candidatePath = Join-Path (Split-Path -Parent $SourcePath) $pathPart
+    try {
+        return (Resolve-Path $candidatePath -ErrorAction Stop).ProviderPath
+    } catch {
+        return $null
+    }
+}
+
+function Rewrite-MarkdownLinks {
+    param(
+        [Parameter(Mandatory=$true)] [AllowEmptyString()] [string]$Line,
+        [Parameter(Mandatory=$true)] [string]$SourcePath,
+        [Parameter(Mandatory=$true)] [hashtable]$LinkMap
+    )
+
+    return [System.Text.RegularExpressions.Regex]::Replace(
+        $Line,
+        '(?<!!)\[(?<label>[^\]]+)\]\((?<target>[^)]+)\)',
+        [System.Text.RegularExpressions.MatchEvaluator]{
+            param($match)
+
+            $targetValue = $match.Groups['target'].Value.Trim()
+            if ($targetValue -match '^<(?<inner>.+)>$') {
+                $targetValue = $Matches['inner']
+            }
+
+            if ($targetValue -match '^(?<url>[^\s]+)\s+".*"$') {
+                $targetValue = $Matches['url']
+            }
+
+            $resolvedPath = Resolve-LocalLinkPath -SourcePath $SourcePath -LinkTarget $targetValue
+            if (-not $resolvedPath) {
+                return $match.Value
+            }
+
+            $anchorTarget = $LinkMap[(Get-NormalizedPathKey -Path $resolvedPath)]
+            if (-not $anchorTarget) {
+                return $match.Value
+            }
+
+            return "[$($match.Groups['label'].Value)]($anchorTarget)"
+        }
+    )
+}
+
+function Shift-MarkdownHeadingLine {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Line
+    )
+
+    if ($Line -notmatch '^(?<indent>\s*)(?<markers>#{1,6})(?<spacing>\s+)(?<title>.+)$') {
+        return $Line
+    }
+
+    $shiftedLevel = [Math]::Min(6, $Matches['markers'].Length + 1)
+    $shiftedMarkers = '#' * $shiftedLevel
+    return "$($Matches['indent'])$shiftedMarkers$($Matches['spacing'])$($Matches['title'])"
+}
+
+function Get-SectionBodyLines {
+    param(
+        [Parameter(Mandatory=$true)] [string]$Path,
+        [Parameter(Mandatory=$true)] [hashtable]$LinkMap
+    )
+
+    $sourceLines = Get-Content -Path $Path -Encoding UTF8
+    $bodyLines = New-Object 'System.Collections.Generic.List[string]'
+    $removedFirstHeading = $false
+    $insideFence = $false
+
+    foreach ($line in $sourceLines) {
+        if ($line -match '^\s*(`{3,}|~{3,})') {
+            $insideFence = -not $insideFence
+            $bodyLines.Add($line)
+            continue
+        }
+
+        if (-not $insideFence -and -not $removedFirstHeading -and $line -match '^\s*#\s+') {
+            $removedFirstHeading = $true
+            continue
+        }
+
+        if (-not $insideFence -and $line -match '^\s*#{2,6}\s+') {
+            $line = Shift-MarkdownHeadingLine -Line $line
+        }
+
+        if (-not $insideFence) {
+            $line = Rewrite-MarkdownLinks -Line $line -SourcePath $Path -LinkMap $LinkMap
+        }
+
+        $bodyLines.Add($line)
+    }
+
+    return @($bodyLines.ToArray())
+}
+
+function New-BookManuscript {
+    param(
+        [Parameter(Mandatory=$true)] [string]$RootPath,
+        [Parameter(Mandatory=$true)] [array]$ChapterEntries,
+        [Parameter(Mandatory=$true)] [string]$CoverPath
+    )
+
+    $manuscriptLines = New-Object 'System.Collections.Generic.List[string]'
+    $linkMap = New-BookLinkMap -ChapterEntries $ChapterEntries -CoverPath $CoverPath
+    $coverAnchorId = Get-CoverAnchorId
+
+    if (Test-Path $CoverPath) {
+        $coverHeadingAssigned = $false
+        foreach ($coverLine in (Get-Content -Path $CoverPath -Encoding UTF8)) {
+            $resolvedCoverLine = Rewrite-MarkdownLinks -Line $coverLine -SourcePath $CoverPath -LinkMap $linkMap
+            if (-not $coverHeadingAssigned -and $resolvedCoverLine -match '^\s*#\s+.+$') {
+                $resolvedCoverLine = "$resolvedCoverLine {#$coverAnchorId}"
+                $coverHeadingAssigned = $true
+            }
+
+            $manuscriptLines.Add($resolvedCoverLine)
+        }
+
+        if ($manuscriptLines.Count -gt 0 -and $manuscriptLines[$manuscriptLines.Count - 1] -ne '') {
+            $manuscriptLines.Add('')
+        }
+    }
+
+    foreach ($chapter in $ChapterEntries) {
+        $chapterTitle = Get-BookChapterTitle -ChapterEntry $chapter
+        $chapterAnchorId = Get-ChapterAnchorId -ChapterEntry $chapter
+        $manuscriptLines.Add("# $chapterTitle {#$chapterAnchorId}")
+        $manuscriptLines.Add('')
+
+        foreach ($chapterFile in $chapter.Files) {
+            $sectionTitle = Get-BookSectionTitle -ChapterFile $chapterFile
+            $sectionAnchorId = Get-SectionAnchorId -ChapterFile $chapterFile
+            $manuscriptLines.Add("## $sectionTitle {#$sectionAnchorId}")
+            $manuscriptLines.Add('')
+
+            foreach ($bodyLine in (Get-SectionBodyLines -Path $chapterFile.FullName -LinkMap $linkMap)) {
+                $manuscriptLines.Add($bodyLine)
+            }
+
+            $manuscriptLines.Add('')
+        }
+    }
+
+    $manuscriptPath = Join-Path ([System.IO.Path]::GetTempPath()) ("clean-architecture.manuscript.$([System.Guid]::NewGuid().ToString('N')).md")
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($manuscriptPath, ($manuscriptLines -join [Environment]::NewLine), $utf8NoBom)
+    Write-Host "🛠 書籍用の一時原稿を生成: $manuscriptPath" -ForegroundColor Green
+
+    return $manuscriptPath
+}
+
+function Get-ChapterEntries {
+    param(
+        [Parameter(Mandatory=$true)] [string]$RootPath
+    )
+
+    $chapterDirs = Get-ChildItem -Path $RootPath -Directory |
+        Where-Object { $_.Name -match '^\d{2}-' } |
+        Sort-Object Name
+
+    $entries = @()
+    foreach ($chapterDir in $chapterDirs) {
+        $chapterFiles = Get-ChildItem -Path $chapterDir.FullName -File -Filter '*.md' |
+            Where-Object { $_.Name -match '^\d{2}-.*\.md$' } |
+            Sort-Object Name
+
+        $entries += [PSCustomObject]@{
+            Directory = $chapterDir
+            Files = @($chapterFiles)
+        }
+    }
+
+    return $entries
+}
+
+function Get-ConversionFiles {
+    param(
+        [Parameter(Mandatory=$true)] [string]$RootPath,
+        [Parameter(Mandatory=$true)] [array]$ChapterEntries
+    )
+
+    $conversionFiles = @()
+
+    $coverPath = Join-Path $RootPath '00-COVER.md'
+    if (Test-Path $coverPath) {
+        $conversionFiles += (Resolve-Path $coverPath -ErrorAction Stop).ProviderPath
+    }
+
+    foreach ($chapter in $ChapterEntries) {
+        foreach ($chapterFile in $chapter.Files) {
+            $conversionFiles += (Resolve-Path $chapterFile.FullName -ErrorAction Stop).ProviderPath
+        }
+    }
+
+    return $conversionFiles
+}
+
+function New-ReadmeTocLines {
+    param(
+        [Parameter(Mandatory=$true)] [array]$ChapterEntries,
+        [Parameter(Mandatory=$true)] [string]$CoverPath
+    )
+
+    $lines = @('<!-- AUTO-TOC:START -->')
+
+    if (Test-Path $CoverPath) {
+        $coverItem = Get-Item $CoverPath
+        $coverTitle = Get-NumberedDisplayTitle -Name $coverItem.Name -MarkdownPath $coverItem.FullName
+        $lines += "- [$coverTitle](./$($coverItem.Name))"
+    }
+
+    foreach ($chapter in $ChapterEntries) {
+        $chapterName = $chapter.Directory.Name
+        $chapterTitle = Get-NumberedDisplayTitle -Name $chapterName
+        $lines += "- [$chapterTitle](./$chapterName/)"
+
+        foreach ($chapterFile in $chapter.Files) {
+            $fileTitle = Get-NumberedDisplayTitle -Name $chapterFile.Name -MarkdownPath $chapterFile.FullName
+            $lines += "  - [$fileTitle](./$chapterName/$($chapterFile.Name))"
+        }
+    }
+
+    $lines += '<!-- AUTO-TOC:END -->'
+    return $lines
+}
+
+function Update-ReadmeToc {
+    param(
+        [Parameter(Mandatory=$true)] [string]$ReadmePath,
+        [Parameter(Mandatory=$true)] [array]$ChapterEntries,
+        [Parameter(Mandatory=$true)] [string]$CoverPath
+    )
+
+    if (-not (Test-Path $ReadmePath)) {
+        Write-Host "⚠️ README が見つからないため目次更新をスキップ: $ReadmePath" -ForegroundColor Yellow
+        return
+    }
+
+    $rawReadme = Get-Content -Path $ReadmePath -Raw -Encoding UTF8
+    $tocPattern = '(?s)<!-- AUTO-TOC:START -->.*?<!-- AUTO-TOC:END -->'
+    if ($rawReadme -notmatch $tocPattern) {
+        Write-Host "⚠️ README に AUTO-TOC マーカーがないため目次更新をスキップしました" -ForegroundColor Yellow
+        return
+    }
+
+    $newTocBlock = (New-ReadmeTocLines -ChapterEntries $ChapterEntries -CoverPath $CoverPath) -join [Environment]::NewLine
+    $updatedReadme = [System.Text.RegularExpressions.Regex]::Replace(
+        $rawReadme,
+        $tocPattern,
+        [System.Text.RegularExpressions.MatchEvaluator]{ param($match) $newTocBlock },
+        1
+    )
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($ReadmePath, $updatedReadme, $utf8NoBom)
+    Write-Host "📝 README の目次を更新: $ReadmePath" -ForegroundColor Green
+}
+
 # 出力フォルダを作成
 if (-not (Test-Path $outputDir)) {
     New-Item -ItemType Directory -Path $outputDir | Out-Null
     Write-Host "📁 出力フォルダを作成: $outputDir" -ForegroundColor Green
 }
 
-# ファイルリスト（変換順序）
-$files = @(
-    "$projectRoot/00-COVER.md",
-    "$projectRoot/01-introduction/01-overview.md",
-    "$projectRoot/01-introduction/02-why-clean-architecture.md",
-    "$projectRoot/01-introduction/03-key-concepts.md",
-    "$projectRoot/02-core-principles/01-single-responsibility.md",
-    "$projectRoot/02-core-principles/02-open-closed.md",
-    "$projectRoot/02-core-principles/03-liskov-substitution.md",
-    "$projectRoot/02-core-principles/04-interface-segregation.md",
-    "$projectRoot/02-core-principles/05-dependency-inversion.md",
-    "$projectRoot/03-architecture-layers/01-presentation-layer.md",
-    "$projectRoot/03-architecture-layers/02-application-layer.md",
-    "$projectRoot/03-architecture-layers/03-domain-layer.md",
-    "$projectRoot/03-architecture-layers/04-infrastructure-layer.md",
-    "$projectRoot/03-architecture-layers/05-layer-dependencies.md",
-    "$projectRoot/04-design-patterns/01-dependency-injection.md",
-    "$projectRoot/04-design-patterns/02-repository-pattern.md",
-    "$projectRoot/04-design-patterns/03-service-pattern.md",
-    "$projectRoot/04-design-patterns/04-dto-pattern.md",
-    "$projectRoot/04-design-patterns/05-adapter-pattern.md",
-    "$projectRoot/05-implementation-guide/01-project-structure.md",
-    "$projectRoot/05-implementation-guide/02-entity-design.md",
-    "$projectRoot/05-implementation-guide/03-usecase-design.md",
-    "$projectRoot/05-implementation-guide/04-implementation-example.md",
-    "$projectRoot/05-implementation-guide/05-testing-strategy.md",
-    "$projectRoot/06-best-practices/01-naming-conventions.md",
-    "$projectRoot/06-best-practices/02-error-handling.md",
-    "$projectRoot/06-best-practices/03-logging-monitoring.md",
-    "$projectRoot/06-best-practices/04-performance-optimization.md",
-    "$projectRoot/06-best-practices/05-security.md",
-    "$projectRoot/07-common-pitfalls/01-over-engineering.md",
-    "$projectRoot/07-common-pitfalls/02-tight-coupling.md",
-    "$projectRoot/07-common-pitfalls/03-anemic-model.md",
-    "$projectRoot/07-common-pitfalls/04-circular-dependency.md",
-    "$projectRoot/08-case-studies/01-ecommerce-site.md",
-    "$projectRoot/08-case-studies/02-sns-platform.md",
-    "$projectRoot/08-case-studies/03-microservices.md"
-)
+# フォルダ/ファイル構造から変換対象を生成
+$chapterEntries = Get-ChapterEntries -RootPath $projectRoot
+$files = Get-ConversionFiles -RootPath $projectRoot -ChapterEntries $chapterEntries
 
-# 不足しているファイルをチェック
-$missingFiles = @()
-foreach ($file in $files) {
-    if (-not (Test-Path $file)) {
-        $missingFiles += $file
-    }
+if ($files.Count -eq 0) {
+    Write-Host "❌ エラー: 変換対象の markdown ファイルが見つかりません" -ForegroundColor Red
+    exit 1
 }
 
-if ($missingFiles.Count -gt 0) {
-    Write-Host "⚠️  見つからないファイル:" -ForegroundColor Yellow
-    $missingFiles | ForEach-Object { Write-Host "   - $_" }
-    Write-Host "🔄 既存ファイルのみで処理を続行します..." -ForegroundColor Yellow
-    
-    # 存在するファイルのみにフィルター
-    $files = $files | Where-Object { Test-Path $_ }
-}
+# 走査結果と同じソースから README の目次も更新
+$readmePath = Join-Path $projectRoot 'README.md'
+$coverPath = Join-Path $projectRoot '00-COVER.md'
+Update-ReadmeToc -ReadmePath $readmePath -ChapterEntries $chapterEntries -CoverPath $coverPath
 
-# 絶対パスに変換して、Pandoc に渡す前のパス変換を正しくする
-$files = $files | ForEach-Object {
-    try {
-        (Resolve-Path $_ -ErrorAction Stop).ProviderPath
-    } catch {
-        throw "ファイルパスの解決に失敗しました: $_"
-    }
-}
+$manuscriptPath = New-BookManuscript -RootPath $projectRoot -ChapterEntries $chapterEntries -CoverPath $coverPath
 
 # metadata.yaml が cover-image: null などを含むとPandocがopenBinaryFileエラーを出す場合があるためクリーンコピーを作成
 $effectiveMetadataFile = $metadataFile
@@ -135,6 +623,7 @@ try {
     Test-ValidPath -Path $metadataFile -Name 'metadata.yaml'
     Test-ValidPath -Path $styleFile -Name 'style.css'
     $files | ForEach-Object { Test-ValidPath -Path $_ -Name "入力ファイル" }
+    Test-ValidPath -Path $manuscriptPath -Name '一時原稿'
 } catch {
     Write-Host "❌ ファイルパス検証エラー: $_" -ForegroundColor Red
     exit 1
@@ -153,7 +642,7 @@ $epubOutput = Join-Path $outputDir "clean-architecture.epub"
 # 目次深度は metadata.yaml (toc-depth) を使用して一元管理する
 
 $pandocArgs = @()
-$pandocArgs += $files
+$pandocArgs += $manuscriptPath
 $pandocArgs += @(
     "--from=markdown+auto_identifiers",
     "--to=epub3",
