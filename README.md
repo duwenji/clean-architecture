@@ -80,7 +80,7 @@
 - Kindle 出力の目次生成ロジックは `.github/skills/ebook-build/scripts/convert-to-kindle.ps1` を正とし、推奨実行入口は `.github/skills/ebook-build/scripts/invoke-ebook-build.ps1` とします。
 - `00-COVER.md` には手動の章一覧テーブルを置かず、見出し構造で目次を表現します。
 - 章フォルダ/章内ファイルの追加・改名は、命名規則（`^\d{2}-`）に従えば README 目次と変換順に自動反映されます。
-- 目次の深さは `.github/skills/ebook-build/configs/clean-architecture.metadata.yaml` の `toc-depth` で管理します。
+- 目次の深さは `.github/skills-config/ebook-build/clean-architecture.metadata.yaml` の `toc-depth` で管理します。
 
 ---
 
@@ -127,7 +127,7 @@
 ```powershell
 cd c:\dev\apps\clean-architecture
 .\.github\skills\ebook-build\scripts\invoke-ebook-build.ps1 `
-  -ConfigFile .\.github\skills\ebook-build\configs\clean-architecture.build.json
+  -ConfigFile .\.github\skills-config\ebook-build\clean-architecture.build.json
 ```
 
 関連ファイル:

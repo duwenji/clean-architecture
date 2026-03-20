@@ -2,7 +2,7 @@
   "sourceRoot": ".",
   "outputDir": ".\\ebook-output",
   "projectName": "clean-architecture",
-  "metadataFile": ".\\.github\\skills\\ebook-build\\configs\\clean-architecture.metadata.yaml",
+  "metadataFile": ".\\.github\\skills-config\\ebook-build\\clean-architecture.metadata.yaml",
   "styleFile": ".\\.github\\skills\\ebook-build\\assets\\style.css",
   "formats": ["epub", "azw3", "mobi"],
   "enablePageList": true,
