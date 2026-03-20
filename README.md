@@ -135,6 +135,16 @@ cd c:\dev\apps\clean-architecture
 - `.github/skills/ebook-build/docs/README.md`
 - `ebook-output/`
 
+submodule 運用コマンド:
+
+```powershell
+# 初回 clone 後
+git submodule update --init --recursive
+
+# 共有 Skill の更新取り込み
+git submodule update --remote --merge .github/skills
+```
+
 **1分で全体像を把握する:**
 → **[表紙で全体像を確認](./00-COVER.md)** してください！
 
