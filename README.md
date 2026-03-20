@@ -17,7 +17,7 @@
 
 この目次はフォルダ/ファイル構造から自動生成されます。
 
-- 生成元: `kindle/convert-to-kindle.ps1`
+- 生成元: `.github/skills/ebook-build/scripts/convert-to-kindle.ps1`
 - 対象フォルダ: `^\d{2}-`
 - 対象ファイル: `^\d{2}-.*\.md`（`README.md`は除外）
 
@@ -77,10 +77,10 @@
 
 ## 📘 Kindle変換時の目次運用
 
-- Kindle 出力の目次は `kindle/convert-to-kindle.ps1` の Pandoc 自動生成を正とします。
+- Kindle 出力の目次生成ロジックは `.github/skills/ebook-build/scripts/convert-to-kindle.ps1` を正とし、推奨実行入口は `.github/skills/ebook-build/scripts/invoke-ebook-build.ps1` とします。
 - `00-COVER.md` には手動の章一覧テーブルを置かず、見出し構造で目次を表現します。
 - 章フォルダ/章内ファイルの追加・改名は、命名規則（`^\d{2}-`）に従えば README 目次と変換順に自動反映されます。
-- 目次の深さは `kindle/metadata.yaml` の `toc-depth` で管理します。
+- 目次の深さは `.github/skills/ebook-build/configs/clean-architecture.metadata.yaml` の `toc-depth` で管理します。
 
 ---
 
@@ -120,6 +120,21 @@
 
 ## ⚡ クイックスタート
 
+### 電子書籍ビルド
+
+推奨コマンド:
+
+```powershell
+cd c:\dev\apps\clean-architecture
+.\.github\skills\ebook-build\scripts\invoke-ebook-build.ps1 `
+  -ConfigFile .\.github\skills\ebook-build\configs\clean-architecture.build.json
+```
+
+関連ファイル:
+- `.github/skills/ebook-build/SKILL.md`
+- `.github/skills/ebook-build/docs/README.md`
+- `ebook-output/`
+
 **1分で全体像を把握する:**
 → **[表紙で全体像を確認](./00-COVER.md)** してください！
 
@@ -143,6 +158,9 @@
 
 ```
 clean-architecture/
+├── .github/
+│   └── skills/
+│       └── ebook-build/      ✅ NEW! 電子書籍生成 Skill
 ├── README.md (このファイル)
 ├── 00-COVER.md                ✅ NEW! ガイド全体の表紙
 ├── QUICK-REFERENCE.md         ✅ クイックリファレンス

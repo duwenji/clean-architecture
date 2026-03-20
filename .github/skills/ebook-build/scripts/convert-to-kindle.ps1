@@ -722,6 +722,11 @@ function Convert-ToMobi {
 # エントリポイント
 # ============================================
 
+# pageList 機能を読み込む
+$pageListFunctionsPath = Join-Path $scriptDir "add-pagelist-functions.ps1"
+if (Test-Path $pageListFunctionsPath) {
+    . $pageListFunctionsPath
+}
 function Main {
     # 出力フォルダを作成
     if (-not (Test-Path $outputDir)) {
@@ -781,13 +786,16 @@ function Main {
     Write-Host "✅ Pandoc を検出しました: $(pandoc --version | Select-Object -First 1)" -ForegroundColor Green
     Write-Host ""
 
-    $epubOutput = Join-Path $outputDir "clean-architecture.epub"
-    $azw3Output = Join-Path $outputDir "clean-architecture.azw3"
-    $mobiOutput = Join-Path $outputDir "clean-architecture.mobi"
+    # 動的にプロジェクト名を取得して出力ファイル名を生成
+    $projectName = (Split-Path -Leaf $projectRoot).ToLowerInvariant()
+    $epubOutput = Join-Path $outputDir "$projectName.epub"
+    $azw3Output = Join-Path $outputDir "$projectName.azw3"
+    $mobiOutput = Join-Path $outputDir "$projectName.mobi"
     $ebookConvert = Get-Command ebook-convert -ErrorAction SilentlyContinue
 
     Convert-ToEpub -ManuscriptPath $manuscriptPath -EffectiveMetadataFile $effectiveMetadataFile -StyleFile $styleFile -EpubOutput $epubOutput
     Convert-ToAzw3 -EpubOutput $epubOutput -Azw3Output $azw3Output -EbookConvert $ebookConvert
+        Add-PageListToEpub -EpubPath $epubOutput
     Convert-ToMobi -EpubOutput $epubOutput -MobiOutput $mobiOutput -EbookConvert $ebookConvert
 
     # ============================================
