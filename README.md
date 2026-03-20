@@ -145,6 +145,9 @@ git submodule update --init --recursive
 git submodule update --remote --merge .github/skills
 ```
 
+共有 Skill リポジトリ:
+- https://github.com/duwenji/shared-copilot-skills
+
 **1分で全体像を把握する:**
 → **[表紙で全体像を確認](./00-COVER.md)** してください！
 
