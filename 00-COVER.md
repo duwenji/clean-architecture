@@ -7,8 +7,6 @@
 
 <div style="text-align: center; margin-top: 100px;">
 
-### 目次
-
 このドキュメントは、クリーンアーキテクチャの原則と実装方法に関する包括的なガイドです。
 
 **From Fundamentals to Production-Ready Code**

@@ -212,9 +212,18 @@ section, article {
 }
 
 /* Kindleナビゲーション対応 */
-.toc {
-  page-break-after: always;
+.toc,
+nav#TOC {
+  page-break-after: auto;
+  page-break-before: auto;
   font-size: 0.95em;
+}
+
+nav#TOC h1,
+nav#TOC h2,
+nav#TOC h3 {
+  page-break-before: auto;
+  page-break-after: avoid;
 }
 
 .toc ul {

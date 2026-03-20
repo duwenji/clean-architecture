@@ -154,7 +154,7 @@ $epubOutput = Join-Path $outputDir "clean-architecture.epub"
 # 1: H1 のみ
 # 2: H1/H2
 # 3+: H1/H2/H3...
-$tocDepth = 3
+$tocDepth = 1
 
 $pandocArgs = @()
 $pandocArgs += $files
