@@ -189,19 +189,19 @@ Step 5: テスト
 ## 🔗 各セクションへのリンク
 
 **初心者向け:**
-- [01-introduction](../01-introduction/) - 基本を理解
-- [02-core-principles](../02-core-principles/) - 原則を学ぶ
-- [03-architecture-layers](../03-architecture-layers/) - 層を把握
+- [01-introduction](01-introduction/) - 基本を理解
+- [02-core-principles](02-core-principles/) - 原則を学ぶ
+- [03-architecture-layers](03-architecture-layers/) - 層を把握
 
 **実装向け:**
-- [04-design-patterns](../04-design-patterns/) - パターン習得
-- [05-implementation-guide](../05-implementation-guide/) - 実装方法
-- [06-best-practices](../06-best-practices/) - 品質向上
+- [04-design-patterns](04-design-patterns/) - パターン習得
+- [05-implementation-guide](05-implementation-guide/) - 実装方法
+- [06-best-practices](06-best-practices/) - 品質向上
 
 **応用向け:**
-- [07-common-pitfalls](../07-common-pitfalls/) - アンチパターン
-- [08-case-studies](../08-case-studies/) - 実装例
-- [09-tools-and-resources](../09-tools-and-resources/) - ツール・リソース
+- [07-common-pitfalls](07-common-pitfalls/) - アンチパターン
+- [08-case-studies](08-case-studies/) - 実装例
+- [09-tools-and-resources](09-tools-and-resources/) - ツール・リソース
 
 ---
 
@@ -251,4 +251,4 @@ async create(@Body() req: CreateUserRequest) {
 
 ---
 
-**最初に読むべきファイル: [01-introduction](../01-introduction/01-overview.md)**
+**最初に読むべきファイル: [01-introduction](01-introduction/01-overview.md)**
