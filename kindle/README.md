@@ -359,32 +359,32 @@ choco install -y calibre
 
 ---
 
-### 🔴 エラー：見つからないファイル
+### 🔴 エラー：想定したファイルが変換対象に入らない
 
 ```
-⚠️  見つからないファイル:
-   - c:\dev\apps\clean-architecture\03-architecture-layers\...
-
-🔄 既存ファイルのみで処理を続行します...
+📚 処理するファイル数: 期待より少ない
 ```
 
 **説明:**
-指定されたマークダウンファイルが存在しません。
+現在の `convert-to-kindle.ps1` は `$files` の手動配列ではなく、
+フォルダ/ファイル名を走査して変換対象を自動決定します。
+
+- 章フォルダ: `^\d{2}-` に一致するディレクトリ
+- 章内ファイル: `^\d{2}-.*\.md` に一致するファイル
+- `README.md` は変換対象外
 
 **解決策:**
 
-1. `convert-to-kindle.ps1` を編集
-2. `$files` 配列で存在しないパスを削除または修正
-3. スクリプトを再実行
+1. 章フォルダ名とファイル名が命名規則に合っているか確認
+2. 必要に応じてファイル名をリネーム（例: `appendix.md` → `10-appendix.md`）
+3. `convert-to-kindle.ps1` を再実行
 
-**編集例:**
+**カスタム取り込み例（命名規則を拡張する場合）:**
 ```powershell
-$files = @(
-    "$projectRoot/00-COVER.md",
-    "$projectRoot/01-introduction/01-overview.md",
-    # 存在しないパスを削除
-    # "$projectRoot/missing-file.md"  ← これを削除
-)
+# Get-ChapterEntries 内の条件を調整
+$chapterDirs = Get-ChildItem -Path $RootPath -Directory |
+  Where-Object { $_.Name -match '^\d{2}-|^appendix-' } |
+  Sort-Object Name
 ```
 
 ---
@@ -452,13 +452,13 @@ h1 {
 ### 例 3️⃣: ファイル変換順序をカスタマイズ
 
 ```powershell
-# convert-to-kindle.ps1 の $files 配列を編集
-$files = @(
-    "$projectRoot/00-COVER.md",
-    "$projectRoot/05-implementation-guide/01-project-structure.md",  # 順序変更
-    "$projectRoot/01-introduction/01-overview.md",                   # 順序変更
-    # ... 他のファイル
-)
+# デフォルトでは番号付きファイル名順（01-, 02-, ...）で処理される
+# 順序を変えたい場合はファイル名の番号を変更する
+# 例: 05-implementation-guide/01-project-structure.md
+#  -> 05-implementation-guide/00-project-structure.md
+
+# 例外的に固定順を実装したい場合は Get-ChapterEntries の
+# Sort-Object 条件をカスタマイズする
 ```
 
 ### 例 4️⃣: 出力ファイル名をカスタマイズ
@@ -502,7 +502,7 @@ $epubOutput = Join-Path $outputDir "my-custom-book.epub"
       └→ EPUB を複数のリーダーで確認
 
 2. EPUB が問題なく表示されたら Calibre をインストール
-   └→ 再度スクリプ트を実行
+  └→ 再度スクリプトを実行
       └→ AZW3/MOBI を生成
 
 3. Kindle デバイスで AZW3 を確認
@@ -517,7 +517,7 @@ $epubOutput = Join-Path $outputDir "my-custom-book.epub"
 
 1. 非常に長い段落（Kindle では高さが無制限）
 2. 複雑なネストされたテーブル（セル > 5 列）
-3. 高解像度画像（ファイル > 1KB/画像）
+3. 高解像度画像（ファイル > 1MB/画像）
 4. 不規則な見出しレベル（H1 → H3 にジャンプ）
 
 # ✅ 推奨される方法
