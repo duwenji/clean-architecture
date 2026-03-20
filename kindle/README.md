@@ -105,9 +105,12 @@ isbn: 978-1234567890
 ```yaml
 toc: true                    ← 目次を自動生成
 toc-depth: 2                 ← 見出しレベル 2 まで含める
-number-sections: false       ← セクション番号を非表示
+number-sections: false       ← Pandoc 自動採番は使わない（見出し番号は変換スクリプトで付与）
 shift-heading-level-by: -1   ← 見出しレベルを 1 段上げる
 ```
+
+補足:
+- EPUB の章・節見出し番号は `01-`, `02-` のようなファイル名接頭辞を `convert-to-kindle.ps1` が取り込み、目次と本文に同じ表記で出力します。
 
 ---
 

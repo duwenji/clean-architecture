@@ -187,6 +187,34 @@ function Get-BookSectionTitle {
     return Get-BookDisplayTitle -Name $ChapterFile.Name -MarkdownPath $ChapterFile.FullName
 }
 
+# EPUB 原稿用: ファイル名の接頭番号を保持した章タイトルを返す
+function Get-EpubChapterTitle {
+    param(
+        [Parameter(Mandatory=$true)] $ChapterEntry
+    )
+
+    $prefix = ''
+    if ($ChapterEntry.Directory.Name -match '^(\d{2})-') {
+        $prefix = "$($Matches[1]). "
+    }
+    $cleanTitle = Get-BookChapterTitle -ChapterEntry $ChapterEntry
+    return "$prefix$cleanTitle"
+}
+
+# EPUB 原稿用: ファイル名の接頭番号を保持した節タイトルを返す
+function Get-EpubSectionTitle {
+    param(
+        [Parameter(Mandatory=$true)] [System.IO.FileInfo]$ChapterFile
+    )
+
+    $prefix = ''
+    if ($ChapterFile.Name -match '^(\d{2})-') {
+        $prefix = "$($Matches[1]). "
+    }
+    $cleanTitle = Get-BookSectionTitle -ChapterFile $ChapterFile
+    return "$prefix$cleanTitle"
+}
+
 function New-AnchorId {
     param(
         [Parameter(Mandatory=$true)] [string]$Prefix,
@@ -420,13 +448,13 @@ function New-BookManuscript {
     }
 
     foreach ($chapter in $ChapterEntries) {
-        $chapterTitle = Get-BookChapterTitle -ChapterEntry $chapter
+        $chapterTitle = Get-EpubChapterTitle -ChapterEntry $chapter
         $chapterAnchorId = Get-ChapterAnchorId -ChapterEntry $chapter
         $manuscriptLines.Add("# $chapterTitle {#$chapterAnchorId}")
         $manuscriptLines.Add('')
 
         foreach ($chapterFile in $chapter.Files) {
-            $sectionTitle = Get-BookSectionTitle -ChapterFile $chapterFile
+            $sectionTitle = Get-EpubSectionTitle -ChapterFile $chapterFile
             $sectionAnchorId = Get-SectionAnchorId -ChapterFile $chapterFile
             $manuscriptLines.Add("## $sectionTitle {#$sectionAnchorId}")
             $manuscriptLines.Add('')
