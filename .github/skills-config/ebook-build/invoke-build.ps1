@@ -92,8 +92,7 @@ if (-not $styleFile) { $styleFile = Join-Path $sharedSkillRoot 'assets/style.css
 $invokeScript = Join-Path $sharedSkillRoot 'scripts/invoke-ebook-build.ps1'
 $kindleTemplateDir = Join-Path $sharedSkillRoot 'scripts'
 
-$formats = if ($null -ne $formatsValue) { @($formatsValue) } else { @('epub', 'azw3', 'mobi') }
-$enablePageList = if ($null -ne $enablePageListValue) { [bool]$enablePageListValue } else { $true }
+$formats = if ($null -ne $formatsValue) { @($formatsValue) } else { @('epub') }
 $chapterDirPattern = if ($chapterDirPatternValue) { [string]$chapterDirPatternValue } else { '^\d{2}-' }
 $chapterFilePattern = if ($chapterFilePatternValue) { [string]$chapterFilePatternValue } else { '^\d{2}-.*\.md$' }
 $coverFile = if ($coverFileValue) { [string]$coverFileValue } else { '00-COVER.md' }
@@ -106,7 +105,6 @@ $params = @{
         MetadataFile = $metadataFile
         StyleFile = $styleFile
         Formats = $formats
-        EnablePageList = $enablePageList
         ChapterDirPattern = $chapterDirPattern
         ChapterFilePattern = $chapterFilePattern
         CoverFile = $coverFile
