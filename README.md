@@ -148,6 +148,31 @@ git submodule update --remote --merge .github/skills
 共有 Skill リポジトリ:
 - https://github.com/duwenji/shared-copilot-skills
 
+## 🧩 Shared Skill 統一導線（Quiz + Ebook）
+
+このリポジトリでは `shared-copilot-skills` を共通ソースとして利用します。
+
+- Quiz validation wrapper: `./.github/skills-config/quiz-generator/invoke-validate.ps1`
+- Quiz config: `./.github/skills-config/quiz-generator/quiz-generator.config.json`
+- Ebook build wrapper: `./.github/skills-config/ebook-build/invoke-build.ps1`
+
+実行例:
+
+```powershell
+cd c:\dev\apps\clean-architecture
+
+# Quiz metadata / question validation
+.\.github\skills-config\quiz-generator\invoke-validate.ps1 -Mode all
+
+# Ebook build
+.\.github\skills-config\ebook-build\invoke-build.ps1
+```
+
+shared skill の探索順:
+1. `./.github/skills/shared-copilot-skills/*`
+2. `./.github/skills/*`
+3. `../shared-copilot-skills/*`
+
 **1分で全体像を把握する:**
 → **[表紙で全体像を確認](./00-COVER.md)** してください！
 
