@@ -9,6 +9,8 @@
 
 **From Fundamentals to Production-Ready Code**
 
+> 💡 ブラウザで https://duwenji.github.io/spa-quiz-app/ を開くと、この教材をクイズ形式で学習できます。
+
 ---
 
 ## 本書の目的
