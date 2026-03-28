@@ -1,3 +1,4 @@
-[submodule ".github/skills"]
-	path = .github/skills
+﻿[submodule ".github/skills/shared-skills"]
+	path = .github/skills/shared-skills
 	url = https://github.com/duwenji/shared-copilot-skills.git
+

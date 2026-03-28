@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [ValidateSet('metadata', 'quiz', 'normalize', 'all')]
     [string]$Mode = 'all',
@@ -28,6 +28,7 @@ function Get-SharedSkillRoot {
     param([string]$RepoRoot)
 
     $candidates = @(
+        (Join-Path $RepoRoot '.github/skills/shared-skills/quiz-generator'),
         (Join-Path $RepoRoot '.github/skills/shared-copilot-skills/quiz-generator'),
         (Join-Path $RepoRoot '.github/skills/quiz-generator'),
         (Join-Path $RepoRoot '../shared-copilot-skills/quiz-generator')
@@ -112,3 +113,4 @@ if ($Mode -eq 'normalize') {
 }
 
 Write-Host "quiz-generator validation wrapper completed: Mode=$Mode"
+

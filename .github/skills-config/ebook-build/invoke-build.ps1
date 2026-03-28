@@ -47,6 +47,7 @@ function Get-SharedSkillRoot {
     param([string]$RepoRoot)
 
     $candidates = @(
+        (Join-Path $RepoRoot '.github/skills/shared-skills/ebook-build'),
         (Join-Path $RepoRoot '.github/skills/shared-copilot-skills/ebook-build'),
         (Join-Path $RepoRoot '.github/skills/ebook-build'),
         (Join-Path $RepoRoot '../shared-copilot-skills/ebook-build')
@@ -114,4 +115,5 @@ $params = @{
 if ($LASTEXITCODE -ne 0) {
     throw "ebook build failed with exit code $LASTEXITCODE"
 }
+
 

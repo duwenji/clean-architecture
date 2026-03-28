@@ -153,6 +153,7 @@ git submodule update --remote --merge .github/skills
 ## 🧩 Shared Skill 統一導線（Quiz + Ebook）
 
 このリポジトリでは `shared-copilot-skills` を共通ソースとして利用します。
+submodule 方式はリポジトリ単位の導入になるため、個別スキルのみを選択して導入することはできません。
 
 - Quiz validation wrapper: `./.github/skills-config/quiz-generator/invoke-validate.ps1`
 - Quiz config: `./.github/skills-config/quiz-generator/quiz-generator.config.json`
@@ -171,7 +172,7 @@ cd c:\dev\apps\clean-architecture
 ```
 
 shared skill の探索順:
-1. `./.github/skills/shared-copilot-skills/*`
+1. `./.github/skills/shared-skills/*`
 2. `./.github/skills/*`
 3. `../shared-copilot-skills/*`
 
