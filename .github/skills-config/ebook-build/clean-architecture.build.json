@@ -1,9 +1,8 @@
 {
   "sourceRoot": ".",
-  "outputDir": ".\\ebook-output",
+  "outputDir": "./ebook-output",
   "projectName": "clean-architecture",
-  "metadataFile": ".\\.github\\skills-config\\ebook-build\\clean-architecture.metadata.yaml",
-  "styleFile": ".\\.github\\skills\\ebook-build\\assets\\style.css",
+  "metadataFile": "./.github/skills-config/ebook-build/clean-architecture.metadata.yaml",
   "chapterDirPattern": "^\\d{2}-",
   "chapterFilePattern": "^\\d{2}-.*\\.md$",
   "coverFile": "00-COVER.md"
