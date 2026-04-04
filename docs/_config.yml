@@ -1,0 +1,6 @@
+title: クリーンアーキテクチャ完全ガイド
+description: クリーンアーキテクチャを理論から実装まで学ぶ日本語教材
+baseurl: "/clean-architecture"
+url: "https://duwenji.github.io"
+theme: minima
+markdown: kramdown

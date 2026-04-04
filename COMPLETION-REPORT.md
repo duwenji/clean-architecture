@@ -421,15 +421,15 @@ Part 3: 実践知識
 |---------|------|
 | [メインREADME](./README.md) | 全体ナビゲーション |
 | [クイックリファレンス](./QUICK-REFERENCE.md) | 30秒で理解 |
-| [01-Introduction](./01-introduction/) | 基本知識 |
-| [02-Core Principles](./02-core-principles/) | SOLID原則 |
-| [03-Architecture](./03-architecture-layers/) | 層構造 |
-| [04-Design Patterns](./04-design-patterns/) | 実装パターン |
-| [05-Implementation](./05-implementation-guide/) | 実装方法 |
-| [06-Best Practices](./06-best-practices/) | ベストプラクティス |
-| [07-Pitfalls](./07-common-pitfalls/) | アンチパターン |
-| [08-Case Studies](./08-case-studies/) | 実装例 |
-| [09-Tools](./09-tools-and-resources/) | ツール・リソース |
+| [01-Introduction](./docs/01-introduction/) | 基本知識 |
+| [02-Core Principles](./docs/02-core-principles/) | SOLID原則 |
+| [03-Architecture](./docs/03-architecture-layers/) | 層構造 |
+| [04-Design Patterns](./docs/04-design-patterns/) | 実装パターン |
+| [05-Implementation](./docs/05-implementation-guide/) | 実装方法 |
+| [06-Best Practices](./docs/06-best-practices/) | ベストプラクティス |
+| [07-Pitfalls](./docs/07-common-pitfalls/) | アンチパターン |
+| [08-Case Studies](./docs/08-case-studies/) | 実装例 |
+| [09-Tools](./docs/09-tools-and-resources/) | ツール・リソース |
 
 ---
 

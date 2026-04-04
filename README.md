@@ -24,55 +24,55 @@
 - 対象ファイル: `^\d{2}-.*\.md`（`README.md`は除外）
 
 <!-- AUTO-TOC:START -->
-- [00. Cover](./00-COVER.md)
-- [01. Introduction](./01-introduction/)
-  - [01. Overview](./01-introduction/01-overview.md)
-  - [02. Why Clean Architecture](./01-introduction/02-why-clean-architecture.md)
-  - [03. Key Concepts](./01-introduction/03-key-concepts.md)
-- [02. Core Principles](./02-core-principles/)
-  - [01. Single Responsibility](./02-core-principles/01-single-responsibility.md)
-  - [02. Open Closed](./02-core-principles/02-open-closed.md)
-  - [03. Liskov Substitution](./02-core-principles/03-liskov-substitution.md)
-  - [04. Interface Segregation](./02-core-principles/04-interface-segregation.md)
-  - [05. Dependency Inversion](./02-core-principles/05-dependency-inversion.md)
-- [03. Architecture Layers](./03-architecture-layers/)
-  - [01. Presentation Layer](./03-architecture-layers/01-presentation-layer.md)
-  - [02. Application Layer](./03-architecture-layers/02-application-layer.md)
-  - [03. Domain Layer](./03-architecture-layers/03-domain-layer.md)
-  - [04. Infrastructure Layer](./03-architecture-layers/04-infrastructure-layer.md)
-  - [05. Layer Dependencies](./03-architecture-layers/05-layer-dependencies.md)
-- [04. Design Patterns](./04-design-patterns/)
-  - [01. Dependency Injection](./04-design-patterns/01-dependency-injection.md)
-  - [02. Repository Pattern](./04-design-patterns/02-repository-pattern.md)
-  - [03. Service Pattern](./04-design-patterns/03-service-pattern.md)
-  - [04. DTO Pattern](./04-design-patterns/04-dto-pattern.md)
-  - [05. Adapter Pattern](./04-design-patterns/05-adapter-pattern.md)
-- [05. Implementation Guide](./05-implementation-guide/)
-  - [01. Project Structure](./05-implementation-guide/01-project-structure.md)
-  - [02. Entity Design](./05-implementation-guide/02-entity-design.md)
-  - [03. Use Case Design](./05-implementation-guide/03-usecase-design.md)
-  - [04. Implementation Example](./05-implementation-guide/04-implementation-example.md)
-  - [05. Testing Strategy](./05-implementation-guide/05-testing-strategy.md)
-- [06. Best Practices](./06-best-practices/)
-  - [01. Naming Conventions](./06-best-practices/01-naming-conventions.md)
-  - [02. Error Handling](./06-best-practices/02-error-handling.md)
-  - [03. Logging Monitoring](./06-best-practices/03-logging-monitoring.md)
-  - [04. Performance Optimization](./06-best-practices/04-performance-optimization.md)
-  - [05. Security](./06-best-practices/05-security.md)
-- [07. Common Pitfalls](./07-common-pitfalls/)
-  - [01. Over Engineering](./07-common-pitfalls/01-over-engineering.md)
-  - [02. Tight Coupling](./07-common-pitfalls/02-tight-coupling.md)
-  - [03. Anemic Model](./07-common-pitfalls/03-anemic-model.md)
-  - [04. Circular Dependency](./07-common-pitfalls/04-circular-dependency.md)
-- [08. Case Studies](./08-case-studies/)
-  - [01. Ecommerce Site](./08-case-studies/01-ecommerce-site.md)
-  - [02. SNS Platform](./08-case-studies/02-sns-platform.md)
-  - [03. Microservices](./08-case-studies/03-microservices.md)
-- [09. Tools and Resources](./09-tools-and-resources/)
-  - [01. Frameworks](./09-tools-and-resources/01-frameworks.md)
-  - [02. DI Containers](./09-tools-and-resources/02-di-containers.md)
-  - [03. Development Tools](./09-tools-and-resources/03-development-tools.md)
-  - [04. Learning Resources](./09-tools-and-resources/04-learning-resources.md)
+- [00. Cover](./docs/00-COVER.md)
+- [01. Introduction](./docs/01-introduction/)
+  - [01. Overview](./docs/01-introduction/01-overview.md)
+  - [02. Why Clean Architecture](./docs/01-introduction/02-why-clean-architecture.md)
+  - [03. Key Concepts](./docs/01-introduction/03-key-concepts.md)
+- [02. Core Principles](./docs/02-core-principles/)
+  - [01. Single Responsibility](./docs/02-core-principles/01-single-responsibility.md)
+  - [02. Open Closed](./docs/02-core-principles/02-open-closed.md)
+  - [03. Liskov Substitution](./docs/02-core-principles/03-liskov-substitution.md)
+  - [04. Interface Segregation](./docs/02-core-principles/04-interface-segregation.md)
+  - [05. Dependency Inversion](./docs/02-core-principles/05-dependency-inversion.md)
+- [03. Architecture Layers](./docs/03-architecture-layers/)
+  - [01. Presentation Layer](./docs/03-architecture-layers/01-presentation-layer.md)
+  - [02. Application Layer](./docs/03-architecture-layers/02-application-layer.md)
+  - [03. Domain Layer](./docs/03-architecture-layers/03-domain-layer.md)
+  - [04. Infrastructure Layer](./docs/03-architecture-layers/04-infrastructure-layer.md)
+  - [05. Layer Dependencies](./docs/03-architecture-layers/05-layer-dependencies.md)
+- [04. Design Patterns](./docs/04-design-patterns/)
+  - [01. Dependency Injection](./docs/04-design-patterns/01-dependency-injection.md)
+  - [02. Repository Pattern](./docs/04-design-patterns/02-repository-pattern.md)
+  - [03. Service Pattern](./docs/04-design-patterns/03-service-pattern.md)
+  - [04. DTO Pattern](./docs/04-design-patterns/04-dto-pattern.md)
+  - [05. Adapter Pattern](./docs/04-design-patterns/05-adapter-pattern.md)
+- [05. Implementation Guide](./docs/05-implementation-guide/)
+  - [01. Project Structure](./docs/05-implementation-guide/01-project-structure.md)
+  - [02. Entity Design](./docs/05-implementation-guide/02-entity-design.md)
+  - [03. Use Case Design](./docs/05-implementation-guide/03-usecase-design.md)
+  - [04. Implementation Example](./docs/05-implementation-guide/04-implementation-example.md)
+  - [05. Testing Strategy](./docs/05-implementation-guide/05-testing-strategy.md)
+- [06. Best Practices](./docs/06-best-practices/)
+  - [01. Naming Conventions](./docs/06-best-practices/01-naming-conventions.md)
+  - [02. Error Handling](./docs/06-best-practices/02-error-handling.md)
+  - [03. Logging Monitoring](./docs/06-best-practices/03-logging-monitoring.md)
+  - [04. Performance Optimization](./docs/06-best-practices/04-performance-optimization.md)
+  - [05. Security](./docs/06-best-practices/05-security.md)
+- [07. Common Pitfalls](./docs/07-common-pitfalls/)
+  - [01. Over Engineering](./docs/07-common-pitfalls/01-over-engineering.md)
+  - [02. Tight Coupling](./docs/07-common-pitfalls/02-tight-coupling.md)
+  - [03. Anemic Model](./docs/07-common-pitfalls/03-anemic-model.md)
+  - [04. Circular Dependency](./docs/07-common-pitfalls/04-circular-dependency.md)
+- [08. Case Studies](./docs/08-case-studies/)
+  - [01. Ecommerce Site](./docs/08-case-studies/01-ecommerce-site.md)
+  - [02. SNS Platform](./docs/08-case-studies/02-sns-platform.md)
+  - [03. Microservices](./docs/08-case-studies/03-microservices.md)
+- [09. Tools and Resources](./docs/09-tools-and-resources/)
+  - [01. Frameworks](./docs/09-tools-and-resources/01-frameworks.md)
+  - [02. DI Containers](./docs/09-tools-and-resources/02-di-containers.md)
+  - [03. Development Tools](./docs/09-tools-and-resources/03-development-tools.md)
+  - [04. Learning Resources](./docs/09-tools-and-resources/04-learning-resources.md)
 <!-- AUTO-TOC:END -->
 
 ---
@@ -91,7 +91,7 @@
 ```
 スタート
   ↓
-0. [表紙を確認](./00-COVER.md) （全体像の把握 - 5分）
+0. [表紙を確認](./docs/00-COVER.md) （全体像の把握 - 5分）
   ↓
 初級者
   ↓
@@ -177,20 +177,20 @@ shared skill の探索順:
 3. `../shared-copilot-skills/*`
 
 **1分で全体像を把握する:**
-→ **[表紙で全体像を確認](./00-COVER.md)** してください！
+→ **[表紙で全体像を確認](./docs/00-COVER.md)** してください！
 
 **30秒で重要ポイントをおさらい:**
 → **[クイックリファレンス](./QUICK-REFERENCE.md)** を参照してください！
 
 **まず最初に読むべき3つのファイル：**
 
-1. 📖 [クリーンアーキテクチャ概要](./01-introduction/01-overview.md)
+1. 📖 [クリーンアーキテクチャ概要](./docs/01-introduction/01-overview.md)
    - 「クリーンアーキテクチャってなに？」がわかります
 
-2. 🎯 [導入のメリット](./01-introduction/02-why-clean-architecture.md)
+2. 🎯 [導入のメリット](./docs/01-introduction/02-why-clean-architecture.md)
    - なぜこんなに複雑な設計が必要なのか？
 
-3. 💡 [主要概念](./01-introduction/03-key-concepts.md)
+3. 💡 [主要概念](./docs/01-introduction/03-key-concepts.md)
    - 3つの重要な特性を理解します
 
 ---
@@ -201,73 +201,25 @@ shared skill の探索順:
 clean-architecture/
 ├── .github/
 │   └── skills/
-│       └── ebook-build/      ✅ NEW! 電子書籍生成 Skill
-├── README.md (このファイル)
-├── 00-COVER.md                ✅ NEW! ガイド全体の表紙
-├── QUICK-REFERENCE.md         ✅ クイックリファレンス
-├── COMPLETION-REPORT.md       ✅ 完成報告書
-│
-├── 01-introduction/           ✅ COMPLETE
-│   ├── 01-overview.md
-│   ├── 02-why-clean-architecture.md
-│   └── 03-key-concepts.md
-│
-├── 02-core-principles/        ✅ COMPLETE
-│   ├── 01-single-responsibility.md (SRP)
-│   ├── 02-open-closed.md (OCP)
-│   ├── 03-liskov-substitution.md (LSP)
-│   ├── 04-interface-segregation.md (ISP)
-│   └── 05-dependency-inversion.md (DIP)
-│
-├── 03-architecture-layers/    ✅ COMPLETE
-│   ├── 01-presentation-layer.md
-│   ├── 02-application-layer.md
-│   ├── 03-domain-layer.md
-│   ├── 04-infrastructure-layer.md
-│   └── 05-layer-dependencies.md
-│
-├── 04-design-patterns/        ✅ COMPLETE
-│   ├── 01-dependency-injection.md
-│   ├── 02-repository-pattern.md
-│   ├── 03-service-pattern.md
-│   ├── 04-dto-pattern.md
-│   └── 05-adapter-pattern.md
-│
-├── 05-implementation-guide/   ✅ COMPLETE
-│   ├── README.md
-│   ├── 01-project-structure.md
-│   ├── 02-entity-design.md
-│   ├── 03-usecase-design.md
-│   ├── 04-implementation-example.md
-│   └── 05-testing-strategy.md
-│
-├── 06-best-practices/         ✅ COMPLETE
-│   ├── README.md
-│   ├── 01-naming-conventions.md
-│   ├── 02-error-handling.md
-│   ├── 03-logging-monitoring.md
-│   ├── 04-performance-optimization.md
-│   └── 05-security.md
-│
-├── 07-common-pitfalls/        ✅ COMPLETE
-│   ├── README.md
-│   ├── 01-over-engineering.md
-│   ├── 02-tight-coupling.md
-│   ├── 03-anemic-model.md
-│   └── 04-circular-dependency.md
-│
-├── 08-case-studies/           ✅ COMPLETE
-│   ├── README.md
-│   ├── 01-ecommerce-site.md
-│   ├── 02-sns-platform.md
-│   └── 03-microservices.md
-│
-└── 09-tools-and-resources/    ✅ COMPLETE
-    ├── README.md
-    ├── 01-frameworks.md
-    ├── 02-di-containers.md
-    ├── 03-development-tools.md
-    └── 04-learning-resources.md
+│       └── ebook-build/
+├── README.md
+├── MASTER-INDEX.md
+├── QUICK-REFERENCE.md
+├── COMPLETION-REPORT.md
+├── ebook-output/
+└── docs/
+    ├── 00-COVER.md
+    ├── index.md
+    ├── _config.yml
+    ├── 01-introduction/
+    ├── 02-core-principles/
+    ├── 03-architecture-layers/
+    ├── 04-design-patterns/
+    ├── 05-implementation-guide/
+    ├── 06-best-practices/
+    ├── 07-common-pitfalls/
+    ├── 08-case-studies/
+    └── 09-tools-and-resources/
 ```
 
 ---
@@ -340,20 +292,20 @@ Part 3: 実践知識         [████████████████] 
 ## 🎓 活用方法
 
 ### 初めての方
-0. **[表紙を確認](./00-COVER.md)** して全体像を理解します（5分）
-1. **[01-introduction](./01-introduction/)** から順に読んで、基本を理解します（30分）
-2. **[02-core-principles](./02-core-principles/)** で SOLID 原則を学びます（1時間）
-3. **[03-architecture-layers](./03-architecture-layers/)** で層構造を把握します（1時間）
+0. **[表紙を確認](./docs/00-COVER.md)** して全体像を理解します（5分）
+1. **[01-introduction](./docs/01-introduction/)** から順に読んで、基本を理解します（30分）
+2. **[02-core-principles](./docs/02-core-principles/)** で SOLID 原則を学びます（1時間）
+3. **[03-architecture-layers](./docs/03-architecture-layers/)** で層構造を把握します（1時間）
 
 ### 実装を始める方
-1. **[04-design-patterns](./04-design-patterns/)** でパターンを習得（1.5時間）
-2. **[05-implementation-guide](./05-implementation-guide/)** で実装方法を学ぶ（2時間）
-3. **[06-best-practices](./06-best-practices/)** を参考に品質を高める
+1. **[04-design-patterns](./docs/04-design-patterns/)** でパターンを習得（1.5時間）
+2. **[05-implementation-guide](./docs/05-implementation-guide/)** で実装方法を学ぶ（2時間）
+3. **[06-best-practices](./docs/06-best-practices/)** を参考に品質を高める
 
 ### 既存プロジェクトの改善
-1. **[07-common-pitfalls](./07-common-pitfalls/)** でアンチパターンを認識
-2. **[08-case-studies](./08-case-studies/)** で実装例を参考に改善案を検討
-3. **[09-tools-and-resources](./09-tools-and-resources/)** で必要なツール・ライブラリを選定
+1. **[07-common-pitfalls](./docs/07-common-pitfalls/)** でアンチパターンを認識
+2. **[08-case-studies](./docs/08-case-studies/)** で実装例を参考に改善案を検討
+3. **[09-tools-and-resources](./docs/09-tools-and-resources/)** で必要なツール・ライブラリを選定
 
 ---
 
@@ -414,7 +366,7 @@ Part 3: 実践知識         [████████████████] 
 
 ---
 
-**次: [表紙で全体像を確認 →](./00-COVER.md)** または **[クリーンアーキテクチャ概要を学ぶ →](./01-introduction/01-overview.md)**
+**次: [表紙で全体像を確認 →](./docs/00-COVER.md)** または **[クリーンアーキテクチャ概要を学ぶ →](./docs/01-introduction/01-overview.md)**
 
 ---
 

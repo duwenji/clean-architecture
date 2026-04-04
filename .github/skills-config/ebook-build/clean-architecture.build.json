@@ -1,5 +1,5 @@
 {
-  "sourceRoot": ".",
+  "sourceRoot": "./docs",
   "outputDir": "./ebook-output",
   "projectName": "clean-architecture",
   "metadataFile": "./.github/skills-config/ebook-build/clean-architecture.metadata.yaml",
