@@ -76,6 +76,9 @@ $formatsValue = Get-ConfigValue -Config $config -Name 'formats'
 $chapterDirPatternValue = Get-ConfigValue -Config $config -Name 'chapterDirPattern'
 $chapterFilePatternValue = Get-ConfigValue -Config $config -Name 'chapterFilePattern'
 $coverFileValue = Get-ConfigValue -Config $config -Name 'coverFile'
+$mermaidModeValue = Get-ConfigValue -Config $config -Name 'mermaidMode'
+$mermaidFormatValue = Get-ConfigValue -Config $config -Name 'mermaidFormat'
+$failOnMermaidErrorValue = Get-ConfigValue -Config $config -Name 'failOnMermaidError'
 
 $projectName = if ($projectNameValue) { [string]$projectNameValue } else { Split-Path -Leaf $repoRoot }
 $sourceRoot = Resolve-ConfiguredPath -BasePath $repoRoot -Value $sourceRootValue
@@ -96,6 +99,9 @@ $formats = if ($null -ne $formatsValue) { @($formatsValue) } else { @('epub') }
 $chapterDirPattern = if ($chapterDirPatternValue) { [string]$chapterDirPatternValue } else { '^\d{2}-' }
 $chapterFilePattern = if ($chapterFilePatternValue) { [string]$chapterFilePatternValue } else { '^\d{2}-.*\.md$' }
 $coverFile = if ($coverFileValue) { [string]$coverFileValue } else { '00-COVER.md' }
+$mermaidMode = if ($mermaidModeValue) { [string]$mermaidModeValue } else { 'auto' }
+$mermaidFormat = if ($mermaidFormatValue) { [string]$mermaidFormatValue } else { 'svg' }
+$failOnMermaidError = if ($null -ne $failOnMermaidErrorValue) { [bool]$failOnMermaidErrorValue } else { $false }
 
 $params = @{
         SourceRoot = $sourceRoot
@@ -108,6 +114,9 @@ $params = @{
         ChapterDirPattern = $chapterDirPattern
         ChapterFilePattern = $chapterFilePattern
         CoverFile = $coverFile
+        MermaidMode = $mermaidMode
+        MermaidFormat = $mermaidFormat
+        FailOnMermaidError = $failOnMermaidError
 }
 
 & $invokeScript @params
