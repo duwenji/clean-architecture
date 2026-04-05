@@ -1,12 +1,6 @@
 # Copilot Instructions
 
-このリポジトリでは、クイズ生成と電子書籍生成を shared-copilot-skills 経由で実行する。
-
-## Quiz Generator
-- 入口: `.github/skills-config/quiz-generator/invoke-validate.ps1`
-- 設定: `.github/skills-config/quiz-generator/quiz-generator.config.json`
-- 優先モード: `-Mode all`
-- データ配置前提: `quiz-output/` 以下に `quizSets.json` と問題JSONを配置
+このリポジトリでは、電子書籍生成を shared-copilot-skills 経由で実行する。
 
 ## Ebook Build
 - 入口: `.github/skills-config/ebook-build/invoke-build.ps1`
