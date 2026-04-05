@@ -1,9 +1,9 @@
 # KDP 登録情報一式: クリーンアーキテクチャ完全ガイド
 
-- 生成日時: 2026-04-05 10:53:23
-- プロジェクト名: `clean-architecture`
-- 元メタデータ: `C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.metadata.yaml`
-- KDP 追加メタデータ: `C:\dev\apps\clean-architecture\.github\skills-config\ebook-build\clean-architecture.kdp.yaml`
+- 生成日時: 2026-04-05 13:00:24
+- プロジェクト名: clean-architecture
+- 元メタデータ: C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.metadata.yaml
+- KDP 追加メタデータ: C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.kdp.yaml
 
 ## 1. 基本書誌情報
 
@@ -60,8 +60,8 @@
 
 ## 7. アップロード対象ファイル
 
-- EPUB: `C:\dev\apps\clean-architecture\.\ebook-output\clean-architecture.epub`
-- PDF: `C:\dev\apps\clean-architecture\.\ebook-output\clean-architecture.pdf`
+- EPUB: C:\dev\apps\clean-architecture\.\ebook-output\clean-architecture.epub
+- PDF: C:\dev\apps\clean-architecture\.\ebook-output\clean-architecture.pdf
 
 ## 8. 公開前 TODO
 
