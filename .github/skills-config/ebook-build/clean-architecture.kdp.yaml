@@ -1,0 +1,27 @@
+title: クリーンアーキテクチャ完全ガイド
+subtitle: 実務で使える設計原則と実装パターン
+description: >
+  クリーンアーキテクチャと SOLID 原則を、実務で使える設計・実装パターンとして整理した日本語ガイドです。
+  依存関係の分離、ユースケース設計、テストしやすい構造づくりまで、サンプルとともに段階的に学べます。
+  初学者から実務レベルまで、理論と実践を一冊でつなげる構成です。
+keywords:
+  - Clean Architecture
+  - SOLID原則
+  - Software Architecture
+  - Design Patterns
+  - 実装パターン
+  - 保守性
+  - テスト容易性
+categories:
+  - Computers / Software Development / General
+  - Computers / Programming / General
+  - Computers / Systems Design
+listPrice: "1980 JPY"
+royaltyPlan: "70%"
+territories: Worldwide
+kdpSelect: "No"
+ageRange: 指定なし
+gradeRange: 指定なし
+trimSize: "6in x 9in"
+bleed: "No bleed"
+layout: fixed-layout PDF

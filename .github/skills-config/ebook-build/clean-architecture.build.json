@@ -2,7 +2,9 @@
   "sourceRoot": "./docs",
   "outputDir": "./ebook-output",
   "projectName": "clean-architecture",
+  "formats": ["epub", "pdf", "kdp-markdown"],
   "metadataFile": "./.github/skills-config/ebook-build/clean-architecture.metadata.yaml",
+  "kdpMetadataFile": "./.github/skills-config/ebook-build/clean-architecture.kdp.yaml",
   "chapterDirPattern": "^\\d{2}-",
   "chapterFilePattern": "^\\d{2}-.*\\.md$",
   "coverFile": "00-COVER.md"
