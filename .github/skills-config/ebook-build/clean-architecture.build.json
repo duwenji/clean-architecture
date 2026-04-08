@@ -1,11 +1,16 @@
 {
+  "projectName": "clean-architecture",
   "sourceRoot": "./docs",
   "outputDir": "./ebook-output",
-  "projectName": "clean-architecture",
   "formats": ["epub", "pdf", "kdp-markdown"],
-  "metadataFile": "./.github/skills-config/ebook-build/clean-architecture.metadata.yaml",
-  "kdpMetadataFile": "./.github/skills-config/ebook-build/clean-architecture.kdp.yaml",
+  "enablePageList": false,
   "chapterDirPattern": "^\\d{2}-",
   "chapterFilePattern": "^\\d{2}-.*\\.md$",
-  "coverFile": "00-COVER.md"
+  "coverFile": "00-COVER.md",
+  "mermaidMode": "auto",
+  "mermaidFormat": "svg",
+  "failOnMermaidError": false,
+  "metadataFile": "./.github/skills-config/ebook-build/clean-architecture.metadata.yaml",
+  "kdpMetadataFile": "./.github/skills-config/ebook-build/clean-architecture.kdp.yaml",
+  "preserveTemp": false
 }

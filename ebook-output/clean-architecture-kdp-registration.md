@@ -1,6 +1,6 @@
 # KDP 登録情報一式: クリーンアーキテクチャ完全ガイド
 
-- 生成日時: 2026-04-05 16:22:01
+- 生成日時: 2026-04-08 22:59:57
 - プロジェクト名: clean-architecture
 - 元メタデータ: C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.metadata.yaml
 - KDP 追加メタデータ: C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.kdp.yaml
@@ -14,7 +14,7 @@
 | 著者 | 杜 文吉 |
 | 言語 | ja-JP |
 | 出版社 | Self Published |
-| 権利 | Creative Commons Attribution 4.0 International |
+| 権利 | Creative Commons Attribution 4.0 International License |
 | 識別子 | clean-architecture-v1 |
 | 出版日 | 2026-03-19 |
 | ISBN | Kindle 版のみなら通常不要 |

@@ -1,40 +1,30 @@
----
-title: クリーンアーキテクチャ完全ガイド
-subtitle: 実務で使える設計原則と実装パターン
-creator: 杜 文吉
-date: 2026-03-19
+title: "クリーンアーキテクチャ完全ガイド"
+subtitle: "実務で使える設計原則と実装パターン"
+creator: "杜 文吉"
+date: "2026-03-19"
 language: ja-JP
-rights: Creative Commons Attribution 4.0 International
-identifier: clean-architecture-v1
-cover-image: null
-
-# Pandoc メタデータ
-toc: true
-toc-depth: 2
-number-sections: false
-shift-heading-level-by: -1
-
-# EPUB設定
-epub-version: 3
-epub-cover-image: null
-
-# HTML/EPUB用メタデータ
+publisher: "Self Published"
+rights: "Creative Commons Attribution 4.0 International License"
+identifier: "clean-architecture-v1"
+description: |
+  クリーンアーキテクチャの原則を、理論と実装の両面から段階的に学べる日本語ガイドです。
+  依存関係の整理、設計境界の引き方、保守しやすい構成パターンを、
+  実務に適用しやすい形でサンプルとともに整理しています。
 keywords:
   - Clean Architecture
-  - SOLID原則
+  - SOLID Principles
   - Design Patterns
   - Software Architecture
   - Software Engineering
-
-# 書籍詳細
-description: >
-  ロバート・C・マーチン（Uncle Bob）が提唱したクリーンアーキテクチャの完全実装マニュアル。
-  初級者から実務レベルまで、理論から実践まで段階的に学べます。
-  サンプルコード付きで、すぐプロジェクトに適用できます。
-
-publisher: Self Published
-isbn: null
-
-# フォントとスタイル（Calibre互換）
-css:
-  - style.css
+cover: "00-COVER.md"
+toc: true
+toc-depth: 2
+chapters:
+  auto-discover: true
+  dir-pattern: "^\\d{2}-"
+  file-pattern: "^\\d{2}-.*\\.md$"
+include-readme: false
+version: "1.0"
+revision-date: "2026-04-08"
+license: "CC-BY-4.0"
+license-url: "https://creativecommons.org/licenses/by/4.0/"
