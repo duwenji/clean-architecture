@@ -1,6 +1,6 @@
 # KDP 登録情報一式: クリーンアーキテクチャ完全ガイド
 
-- 生成日時: 2026-04-08 22:59:57
+- 生成日時: 2026-04-11 16:33:30
 - プロジェクト名: clean-architecture
 - 元メタデータ: C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.metadata.yaml
 - KDP 追加メタデータ: C:\dev\apps\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.kdp.yaml
