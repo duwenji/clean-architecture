@@ -19,7 +19,7 @@
 
 この目次はフォルダ/ファイル構造から自動生成されます。
 
-- 生成元: `.github/skills/ebook-build/scripts/convert-to-kindle.ps1`
+- 生成元: `../shared-copilot-skills/ebook-build/scripts/convert-to-kindle.ps1`
 - 対象フォルダ: `^\d{2}-`
 - 対象ファイル: `^\d{2}-.*\.md`（`README.md`は除外）
 
@@ -79,7 +79,7 @@
 
 ## 📘 Kindle変換時の目次運用
 
-- Kindle 出力の目次生成ロジックは `.github/skills/ebook-build/scripts/convert-to-kindle.ps1` を正とし、推奨実行入口は `.github/skills/ebook-build/scripts/invoke-ebook-build.ps1` とします。
+- Kindle 出力の目次生成ロジックは `../shared-copilot-skills/ebook-build/scripts/convert-to-kindle.ps1` を正とし、推奨実行入口は `.github/skills-config/ebook-build/invoke-build.ps1` とします。
 - `00-COVER.md` には手動の章一覧テーブルを置かず、見出し構造で目次を表現します。
 - 章フォルダ/章内ファイルの追加・改名は、命名規則（`^\d{2}-`）に従えば README 目次と変換順に自動反映されます。
 - 目次の深さは `.github/skills-config/ebook-build/clean-architecture.metadata.yaml` の `toc-depth` で管理します。
@@ -128,13 +128,12 @@
 
 ```powershell
 cd c:\dev\apps\clean-architecture
-.\.github\skills\ebook-build\scripts\invoke-ebook-build.ps1 `
-  -ConfigFile .\.github\skills-config\ebook-build\clean-architecture.build.json
+.\.github\skills-config\ebook-build\invoke-build.ps1
 ```
 
 関連ファイル:
-- `.github/skills/ebook-build/SKILL.md`
-- `.github/skills/ebook-build/docs/README.md`
+- `../shared-copilot-skills/ebook-build/SKILL.md`
+- `../shared-copilot-skills/ebook-build/EBOOK_BUILD_SPECIFICATION.md`
 - `ebook-output/`
 
 submodule 運用コマンド:
@@ -167,9 +166,9 @@ cd c:\dev\apps\clean-architecture
 ```
 
 shared skill の探索順:
-1. `./.github/skills/shared-skills/*`
-2. `./.github/skills/*`
-3. `../shared-copilot-skills/*`
+1. `../shared-copilot-skills/*`
+2. `./.github/skills/shared-skills/*`
+3. `./.github/skills/shared-copilot-skills/*`
 
 **1分で全体像を把握する:**
 → **[表紙で全体像を確認](./docs/00-COVER.md)** してください！
@@ -195,7 +194,7 @@ shared skill の探索順:
 ```
 clean-architecture/
 ├── .github/
-│   └── skills/
+│   └── skills-config/
 │       └── ebook-build/
 ├── README.md
 ├── MASTER-INDEX.md
