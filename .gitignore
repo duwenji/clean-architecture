@@ -1,3 +1,4 @@
 ebook-output/**/*.azw3
 ebook-output/**/*.epub
 ebook-output/**/*.mobi
+node_modules/
