@@ -1,0 +1,35 @@
+name: Feature request
+description: ガイドに追加したい章立てや改善案を提案します
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 背景・課題
+      description: どんな学習上・実務上の課題を解決したいですか？
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案内容
+      description: 追加したい章、サンプルコード、演習など
+    validations:
+      required: true
+
+  - type: dropdown
+    id: section
+    attributes:
+      label: 関連セクション
+      options:
+        - 01. Introduction
+        - 02. Core Principles
+        - 03. Architecture Layers
+        - 04. Design Patterns
+        - 05. Implementation Guide
+        - 06. Best Practices
+        - 07. Common Pitfalls
+        - 08. Case Studies
+        - 09. Tools and Resources

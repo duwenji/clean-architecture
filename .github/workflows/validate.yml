@@ -1,0 +1,27 @@
+name: Validate tutorial repo
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Build ebook
+        shell: pwsh
+        run: |
+          ./.github/skills-config/ebook-build/invoke-build.ps1 -BuildStep step1
+          ./.github/skills-config/ebook-build/invoke-build.ps1 -BuildStep step2
+          ./.github/skills-config/ebook-build/invoke-build.ps1 -BuildStep step3
+          ./.github/skills-config/ebook-build/invoke-build.ps1 -BuildStep step2b
