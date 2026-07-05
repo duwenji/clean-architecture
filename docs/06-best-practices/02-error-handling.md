@@ -24,7 +24,7 @@ flowchart TD
 
     B["アプリケーション層エラー<br/>（ロジックエラー）"] --> B1["ユースケース実行の問題"]
     B --> B2["トランザクション失敗"]
-    B --> B3["例: UserAlreadyExistsError, DataConsistencyError"]
+    B --> B3["例: UserAlreadyExistsApplicationError, DataConsistencyError"]
 
     C["システムエラー<br/>（インフラエラー）"] --> C1["回復困難なエラー"]
     C --> C2["外部依存の失敗"]

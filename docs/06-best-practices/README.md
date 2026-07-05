@@ -37,7 +37,6 @@ export class DomainError extends Error {
 }
 
 export class InvalidEmailError extends DomainError {}
-export class UserAlreadyExistsError extends DomainError {}
 export class InsufficientBalanceError extends DomainError {}
 ```
 
@@ -47,14 +46,11 @@ export class InsufficientBalanceError extends DomainError {}
 try {
   await useCase.execute(request);
 } catch (error) {
+  // ドメインエラーをアプリケーション層エラーに変換して再スロー
   if (error instanceof InvalidEmailError) {
-    // ビジネスエラー（回復可能）
-    res.status(400).json({ error: error.message });
-  } else if (error instanceof DatabaseError) {
-    // システムエラー
-    res.status(500).json({ error: 'Internal Server Error' });
-    logger.error('Database failed', error);
+    throw new InvalidEmailApplicationError(error.message);
   }
+  throw error; // その他はそのままスロー（プレゼンテーション層でHTTP応答に変換）
 }
 ```
 
@@ -62,8 +58,8 @@ try {
 
 ```typescript
 const errorStatusMap = {
-  'InvalidEmailError': 400,
-  'UserAlreadyExistsError': 409,
+  'InvalidEmailApplicationError': 400,
+  'UserAlreadyExistsApplicationError': 409,
   'UserNotFoundError': 404,
   'UnauthorizedError': 401,
   'ForbiddenError': 403,
