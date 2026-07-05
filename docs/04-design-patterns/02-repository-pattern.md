@@ -1,4 +1,4 @@
-# 02. リポジトリパターン (Repository Pattern)
+# リポジトリパターン (Repository Pattern)
 
 > **パターン**: データベース操作をカプセル化。ドメイン層がDB方言を知らない。
 

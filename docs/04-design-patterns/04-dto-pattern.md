@@ -1,4 +1,4 @@
-# 04. DTO パターン (Data Transfer Object)
+# DTO パターン (Data Transfer Object)
 
 > **パターン**: 層間でのデータ転送用オブジェクト。ドメインモデルと外部表現を分離。
 

@@ -1,4 +1,4 @@
-# 05. 層の依存関係ルール (Layer Dependency Rules)
+# 層の依存関係ルール (Layer Dependency Rules)
 
 > **最も重要なルール**: 内側の層は外側の層に依存しない。外側の層が内側の層に依存する一方向のみ。
 

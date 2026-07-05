@@ -1,4 +1,4 @@
-# 01. 単一責任の原則 (SRP) - Single Responsibility Principle
+# 単一責任の原則 (SRP) - Single Responsibility Principle
 
 > **原則**: クラスは変更する理由が1つだけであるべき。言い換えれば、クラスは1つの責任だけを持つべき。
 

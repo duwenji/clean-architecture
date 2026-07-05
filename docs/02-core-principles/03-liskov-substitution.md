@@ -1,4 +1,4 @@
-# 03. リスコフの置換原則 (LSP) - Liskov Substitution Principle
+# リスコフの置換原則 (LSP) - Liskov Substitution Principle
 
 > **原則**: サブタイプはスーパータイプと置き換え可能であるべき。派生クラスがベースクラスのインターフェースを破ってはいけない。
 

@@ -1,4 +1,4 @@
-# 04: 循環依存（Circular Dependency）
+# 循環依存（Circular Dependency）
 
 モジュール間の循環参照を検出・排除する。
 

@@ -1,4 +1,4 @@
-# 04. インターフェース分離の原則 (ISP) - Interface Segregation Principle
+# インターフェース分離の原則 (ISP) - Interface Segregation Principle
 
 > **原則**: クライアントは自分が使わないメソッドに依存してはいけない。大きなインターフェースは小さな専門的インターフェースに分割すべき。
 

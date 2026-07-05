@@ -1,4 +1,4 @@
-# 01: 過度な設計（Over-Engineering）
+# 過度な設計（Over-Engineering）
 
 プロジェクト規模に適していない複雑な設計を避ける。
 

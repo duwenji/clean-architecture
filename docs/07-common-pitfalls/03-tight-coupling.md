@@ -1,4 +1,4 @@
-# 02: 密結合（Tight Coupling）
+# 密結合（Tight Coupling）
 
 層間の依存関係を逆転させて疎結合を実現する。
 

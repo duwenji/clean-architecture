@@ -1,4 +1,4 @@
-# 01. 依存性注入 (Dependency Injection)
+# 依存性注入 (Dependency Injection)
 
 > **パターン**: オブジェクトの依存関係を外部から注入する。テスト性と柔軟性を大幅に向上させる。
 
