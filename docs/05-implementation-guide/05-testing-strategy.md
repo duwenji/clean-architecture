@@ -480,6 +480,7 @@ import { RegisterUserUseCase } from "../../src/application/usecases/RegisterUser
 import { UserRepository } from "../../src/infrastructure/repositories/UserRepository";
 import { MySQLConnection, Database } from "../../src/infrastructure/database/MySQLConnection";
 import { EmailAdapter } from "../../src/infrastructure/services/EmailAdapter";
+import { BcryptHasher } from "../../src/infrastructure/services/BcryptHasher";
 import { RegisterUserRequest } from "../../src/application/dtos/RegisterUserRequest";
 
 describe("RegisterUserUseCase Integration Test", () => {
@@ -517,8 +518,9 @@ describe("RegisterUserUseCase Integration Test", () => {
 
     const userRepository = new UserRepository(database);
     const emailService = new EmailAdapter();
+    const passwordHasher = new BcryptHasher();
 
-    useCase = new RegisterUserUseCase(userRepository, emailService);
+    useCase = new RegisterUserUseCase(userRepository, emailService, passwordHasher);
   });
 
   afterAll(async () => {
