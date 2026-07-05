@@ -23,6 +23,16 @@ chapters:
   auto-discover: true
   dir-pattern: "^\\d{2}-"
   file-pattern: "^\\d{2}-.*\\.md$"
+  dir-titles:
+    01-introduction: "基礎理論：導入"
+    02-core-principles: "基礎理論：SOLID原則"
+    03-architecture-layers: "基礎理論：アーキテクチャ層"
+    04-design-patterns: "実装パターン：デザインパターン"
+    05-implementation-guide: "実装パターン：実装ガイド"
+    06-best-practices: "実装パターン：ベストプラクティス"
+    07-common-pitfalls: "実践知識：よくある間違い"
+    08-case-studies: "実践知識：ケーススタディ"
+    09-tools-and-resources: "実践知識：ツールとリソース"
 include-readme: false
 version: "1.0"
 revision-date: "2026-04-08"

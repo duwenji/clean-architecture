@@ -11,10 +11,24 @@
   "kdpMetadataFile": "./.github/skills-config/ebook-build/clean-architecture.kdp.yaml",
   "chapterDirPattern": "^\\d{2}-",
   "chapterFilePattern": "^\\d{2}-.*\\.md$",
+  "headingNumbering": true,
+  "tocDepth": 2,
   "coverFile": "00-COVER.md",
+  "coverTemplateMode": "auto",
+  "coverTemplate": "classic",
+  "coverMode": "ai-image",
+  "coverImagePromptSourceFile": "./docs/01-cover-prompt.md",
+  "coverImagePromptFile": "./ebook-output/prompts/cover-image-prompt.md",
+  "collectAssets": true,
+  "normalizeManuscript": true,
+  "requireManuscriptApproval": false,
+  "approvalTokenFile": "./ebook-output/clean-architecture.manuscript.approved",
+  "generateManuscriptReviewReport": false,
+  "manuscriptReviewReviewer": "automated-baseline",
+  "manuscriptReviewDecision": "Approve",
   "mermaidMode": "required",
-  "mermaidFormat": "svg",
+  "mermaidFormat": "png",
   "failOnMermaidError": true,
-  "preserveTemp": false
+  "mermaidConfigFile": "./.github/skills-config/ebook-build/mermaid.epub.config.json",
+  "mermaidPuppeteerConfigFile": "./.github/skills-config/ebook-build/mermaid.puppeteer.config.json"
 }
-
