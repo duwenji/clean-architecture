@@ -4,17 +4,13 @@
 
 ## 🎯 層の位置付け
 
-```
-┌──────────────────────────┐
-│  プレゼンテーション層     │
-├──────────────────────────┤
-│  アプリケーション層       │
-├──────────────────────────┤
-│  ドメイン層              │
-├──────────────────────────┤
-│  インフラストラクチャ層   │  ← ここ
-│ (DB, 外部API)           │
-└──────────────────────────┘
+```mermaid
+flowchart TD
+    A["プレゼンテーション層"]
+    B["アプリケーション層"]
+    C["ドメイン層"]
+    D["インフラストラクチャ層<br/>(DB, 外部API) ← ここ"]
+    A --- B --- C --- D
 ```
 
 ---
@@ -429,19 +425,23 @@ export class CachedUserRepository implements UserRepository {
 
 ## 📊 DB抽象化のメリット
 
+```mermaid
+flowchart TD
+    Interface["インターフェース: UserRepository"]
+    Impl1["実装1: MySQLUserRepository"]
+    Impl2["実装2: MongoDBUserRepository"]
+    Impl3["実装3: PostgreSQLUserRepository"]
+    Impl4["実装4: CachedUserRepository"]
+    Impl1 --> Interface
+    Impl2 --> Interface
+    Impl3 --> Interface
+    Impl4 --> Interface
 ```
-インターフェース：UserRepository
-        ↑
-    実装1: MySQLUserRepository
-    実装2: MongoDBUserRepository
-    実装3: PostgreSQLUserRepository
-    実装4: CachedUserRepository
 
 メリット：
 - DB を切り替え可能
 - テスト時にモック可能
 - キャッシュレイアーを透過的に追加可能
-```
 
 ---
 

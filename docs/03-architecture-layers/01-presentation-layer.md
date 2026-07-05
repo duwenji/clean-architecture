@@ -4,20 +4,13 @@
 
 ## 🎯 層の位置付け
 
-```
-┌──────────────────────────┐
-│  プレゼンテーション層      │ ← ここ
-│ (Web Controller, API)    │
-├──────────────────────────┤
-│  アプリケーション層       │
-│ (ユースケース)            │
-├──────────────────────────┤
-│  ドメイン層              │
-│ (ビジネスロジック)       │
-├──────────────────────────┤
-│  インフラストラクチャ層   │
-│ (DB, 外部API)           │
-└──────────────────────────┘
+```mermaid
+flowchart TD
+    A["プレゼンテーション層<br/>(Web Controller, API) ← ここ"]
+    B["アプリケーション層<br/>(ユースケース)"]
+    C["ドメイン層<br/>(ビジネスロジック)"]
+    D["インフラストラクチャ層<br/>(DB, 外部API)"]
+    A --- B --- C --- D
 ```
 
 ---
@@ -283,17 +276,12 @@ export function createValidationMiddleware(schema: Joi.Schema) {
 
 クリーンアーキテクチャでは、複数の UI をサポートできます：
 
-```
-同じユースケース層を使用
-      ↓
-┌─────────────────────────────────────┐
-│  Web API (REST/GraphQL)            │
-│  UI（React SPA）                    │
-│  モバイルAPI                        │
-│  CLI                                │
-└─────────────────────────────────────┘
-      ↑ 全て同じビジネスロジック
-      └─ RegisterUserUseCase など
+```mermaid
+flowchart TD
+    UC["同じユースケース層を使用<br/>(RegisterUserUseCase など)"]
+    Media["Web API (REST/GraphQL)<br/>UI（React SPA）<br/>モバイルAPI<br/>CLI"]
+    UC --> Media
+    Media -->|全て同じビジネスロジック| UC
 ```
 
 ### 複数の Controller 実装例

@@ -4,24 +4,19 @@
 
 ## 🎯 コンセプト
 
-```
-❌ 従来の依存関係（上から下へ）
-UserService
-  ↓ 依存
-MySQLDatabase
-  ↓ 依存
-MySQLDriver
+```mermaid
+flowchart TD
+    subgraph Before["❌ 従来の依存関係（上から下へ）<br/>問題：データベースを変更したら全て変更する必要"]
+        direction TB
+        B1[UserService] -->|依存| B2[MySQLDatabase]
+        B2 -->|依存| B3[MySQLDriver]
+    end
 
-問題：データベースを変更したら全て変更する必要
-
-✅ 逆転した依存関係（抽象化に依存）
-UserService
-  ↓ 依存
-Database インターフェース
-  ↑ 実装
-MySQLDatabase  or  PostgreSQLDatabase
-
-メリット：どのDBを使うか選べる
+    subgraph After["✅ 逆転した依存関係（抽象化に依存）<br/>メリット：どのDBを使うか選べる"]
+        direction TB
+        A1[UserService] -->|依存| A2["Database インターフェース"]
+        A3["MySQLDatabase or PostgreSQLDatabase"] -->|実装| A2
+    end
 ```
 
 ---
@@ -310,25 +305,21 @@ const userService = container.get<UserService>(UserService);
 
 ### ❌ DIP違反（上から下へ）
 
-```
-  UI層
-    ↓ 依存
-Application層
-    ↓ 依存
-MySQL実装
-
-→ 下位層を変更すると上位層全て影響
+```mermaid
+flowchart TD
+    UI[UI層] -->|依存| App[Application層]
+    App -->|依存| MySQL[MySQL実装]
+    MySQL --> Result["下位層を変更すると上位層全て影響"]
 ```
 
 ### ✅ DIP適用（両方が抽象化に依存）
 
-```
-  UI層          Application層          インフラ層
-     ↓            ↓                        ↓
-     └─────────→ 抽象化 ←─────────────┘
-              (UserRepository)
-
-→ インフラ層の実装を変更しても上位層は影響なし
+```mermaid
+flowchart TD
+    UI[UI層] --> Abs["抽象化<br/>(UserRepository)"]
+    App[Application層] --> Abs
+    Infra[インフラ層] --> Abs
+    Abs --> Result["インフラ層の実装を変更しても上位層は影響なし"]
 ```
 
 ---
@@ -392,20 +383,14 @@ describe('UserService with DIP', () => {
 
 ## 📊 SOLID原則と DIP の関係
 
-```
-DIP（依存性逆転の原則）
-  ↑
-  実装に必要な他の4つの原則
-  
-SRP（単一責任）→ 変更理由が明確
-  ↓
-OCP（開放閉鎖）→ 拡張ポイントが定まる
-  ↓
-LSP（リスコフ置換）→ インターフェース契約
-  ↓
-ISP（インターフェース分離）→ 必要な機能のみ
-  ↓
-DIP（依存性逆転）→ 抽象化に依存する設計
+```mermaid
+flowchart TD
+    Others["実装に必要な他の4つの原則"] -->|支える| Top["DIP（依存性逆転の原則）"]
+
+    SRP["SRP（単一責任）"] -->|変更理由が明確| OCP["OCP（開放閉鎖）"]
+    OCP -->|拡張ポイントが定まる| LSP["LSP（リスコフ置換）"]
+    LSP -->|インターフェース契約| ISP["ISP（インターフェース分離）"]
+    ISP -->|"必要な機能のみ<br/>→ 抽象化に依存する設計"| Top
 ```
 
 ---
@@ -436,15 +421,11 @@ DIP（依存性逆転）→ 抽象化に依存する設計
 
 ## 📈 実装レベルの段階
 
-```
-段階1: SRP + OCP
-  → 各クラスが明確な責任を持つ
-
-段階2: + LSP + ISP
-  → インターフェースが適切に定義される
-
-段階3: + DIP
-  → 完全なテスト可能設計が実現
+```mermaid
+flowchart TD
+    S1["段階1: SRP + OCP"] -->|各クラスが明確な責任を持つ| S2["段階2: + LSP + ISP"]
+    S2 -->|インターフェースが適切に定義される| S3["段階3: + DIP"]
+    S3 -->|完全なテスト可能設計が実現| Result["完全なテスト可能設計"]
 ```
 
 ---

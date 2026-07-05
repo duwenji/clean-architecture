@@ -4,19 +4,14 @@
 
 ## 🎯 コンセプト
 
-```
-┌──────────────────────────────────────────┐
-│ 1つのクラス = 1つの変更理由               │
-├──────────────────────────────────────────┤
-│ "変更する理由"とは：要件変更のこと       │
-│                                          │
-│ 例：                                     │
-│ ・ UI形式を変更したい                   │
-│ ・ ビジネスルールを変更したい           │
-│ ・ DBを変更したい                       │
-│                                          │
-│ → 各々が別のクラスの責任                │
-└──────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Title["1つのクラス = 1つの変更理由"]
+    Title --> Reason["&quot;変更する理由&quot;とは：要件変更のこと"]
+    Reason --> E1["UI形式を変更したい"]
+    Reason --> E2["ビジネスルールを変更したい"]
+    Reason --> E3["DBを変更したい"]
+    E1 & E2 & E3 --> Conclusion["各々が別のクラスの責任"]
 ```
 
 ---
@@ -90,14 +85,12 @@ export class UserService {
 
 ## ✅ SRP を適用した設計
 
-```
-UserService (複数の責任)
-       ↓ 分割
-    ┌──┴──┐
-    │     │
-    ↓     ↓
-UserRepository   PasswordService   EmailService   ...
-(ユーザー管理)    (パスワード処理)   (メール送信)
+```mermaid
+flowchart TD
+    U["UserService<br/>(複数の責任)"] -->|分割| R["UserRepository<br/>(ユーザー管理)"]
+    U -->|分割| P["PasswordService<br/>(パスワード処理)"]
+    U -->|分割| E["EmailService<br/>(メール送信)"]
+    U -->|分割| Etc["..."]
 ```
 
 ### Step 1: 責任ごとにクラスを分割
@@ -251,24 +244,27 @@ export class RegisterUserUseCase {
 
 ## 📊 SRP適用前後の比較
 
-```
-適用前：UserService
-├─ getUserInfo()
-├─ changePassword()
-├─ validateEmail()
-├─ sendWelcomeEmail()
-├─ deleteUser()
-├─ searchUsers()
-└─ その他多数...
-→ 500行以上、変更理由が6個以上
+```mermaid
+flowchart TD
+    subgraph Before["適用前：UserService（500行以上、変更理由が6個以上）"]
+        direction TB
+        B0[UserService] --> B1["getUserInfo()"]
+        B0 --> B2["changePassword()"]
+        B0 --> B3["validateEmail()"]
+        B0 --> B4["sendWelcomeEmail()"]
+        B0 --> B5["deleteUser()"]
+        B0 --> B6["searchUsers()"]
+        B0 --> B7["その他多数..."]
+    end
 
-適用後：各クラスが1つの責任
-├─ User (ユーザー情報、バリデーション)
-├─ PasswordService (パスワード処理)
-├─ EmailService (メール送信)
-├─ UserRepository (ユーザーの永続化)
-└─ RegisterUserUseCase (統合)
-→ 各クラスが40-100行、変更理由が1つ
+    subgraph After["適用後：各クラスが1つの責任（各クラス40-100行、変更理由が1つ）"]
+        direction TB
+        A1["User<br/>(ユーザー情報、バリデーション)"]
+        A2["PasswordService<br/>(パスワード処理)"]
+        A3["EmailService<br/>(メール送信)"]
+        A4["UserRepository<br/>(ユーザーの永続化)"]
+        A5["RegisterUserUseCase<br/>(統合)"]
+    end
 ```
 
 ---

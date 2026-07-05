@@ -321,24 +321,19 @@ async def get_user(
 
 ## 🎯 選定フローチャート
 
-```
-プロジェクトを始める
-│
-├─ MVP・プロトタイプ？
-│  ├─ YES → Express + Type-DI
-│  └─ NO ↓
-│
-├─ チーム規模 5名以上？
-│  ├─ YES → NestJS（TypeScript）or Spring Boot（Java）
-│  └─ NO → Express + Type-DI
-│
-├─ 高性能 API が必須？
-│  ├─ YES → Fastify or FastAPI
-│  └─ NO ↓
-│
-└─ エンタープライズ・金融系？
-   ├─ YES → Spring Boot
-   └─ NO → NestJS（TypeScript推奨）
+```mermaid
+flowchart TD
+    Start["プロジェクトを始める"] --> Q1{"MVP・プロトタイプ？"}
+    Q1 -->|YES| E1["Express + Type-DI"]
+    Q1 -->|NO| Q2{"チーム規模 5名以上？"}
+    Q2 -->|YES| N1["NestJS（TypeScript）or Spring Boot（Java）"]
+    Q2 -->|NO| E2["Express + Type-DI"]
+
+    Start --> Q3{"高性能 API が必須？"}
+    Q3 -->|YES| F1["Fastify or FastAPI"]
+    Q3 -->|NO| Q4{"エンタープライズ・金融系？"}
+    Q4 -->|YES| S1["Spring Boot"]
+    Q4 -->|NO| N2["NestJS（TypeScript推奨）"]
 ```
 
 ---

@@ -4,19 +4,26 @@
 
 ## 🎯 コンセプト
 
-```
-大きなインターフェース
-├─ メソッドA（使いたい）
-├─ メソッドB（使いたい）
-├─ メソッドC（使いたくない）
-├─ メソッドD（使いたくない）
-└─ メソッドE（使いたくない）
-
-      ↓ 分割
-
-小さな専門的インターフェース
-├─ InterfaceX（メソッドA, B）
-└─ InterfaceY（メソッドC, D, E）
+```mermaid
+classDiagram
+    class BigInterface["大きなインターフェース"] {
+        +メソッドA() 使いたい
+        +メソッドB() 使いたい
+        +メソッドC() 使いたくない
+        +メソッドD() 使いたくない
+        +メソッドE() 使いたくない
+    }
+    class InterfaceX {
+        +メソッドA()
+        +メソッドB()
+    }
+    class InterfaceY {
+        +メソッドC()
+        +メソッドD()
+        +メソッドE()
+    }
+    BigInterface ..> InterfaceX : 分割
+    BigInterface ..> InterfaceY : 分割
 ```
 
 ---

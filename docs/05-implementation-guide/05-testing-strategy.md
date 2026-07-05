@@ -6,15 +6,11 @@
 
 ## 🎯 テスト戦略の方針
 
-```
-Domain（ビジネスロジック）
-  └─ ユニットテスト [最重要]
-  
-Application（ユースケース）
-  └─ ユニット + 統合テスト
-  
-Presentation & Infrastructure
-  └─ 統合テスト + モック
+```mermaid
+flowchart TD
+    A["Domain（ビジネスロジック）"] --> A2["ユニットテスト<br/>[最重要]"]
+    B["Application（ユースケース）"] --> B2["ユニット + 統合テスト"]
+    C["Presentation & Infrastructure"] --> C2["統合テスト + モック"]
 ```
 
 ---

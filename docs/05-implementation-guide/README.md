@@ -18,11 +18,9 @@
 
 ## 🎯 このセクションのゴール
 
-```
-理論を学んだ → 実装できる
-
-前セクション：「なぜ？」「どう動く？」
-このセクション：「どう作る？」
+```mermaid
+flowchart LR
+    A["前セクション<br/>「なぜ？」「どう動く？」"] -->|理論を学んだ → 実装できる| B["このセクション<br/>「どう作る？」"]
 ```
 
 ---
@@ -78,18 +76,13 @@ src/
 
 ### 層間のデータフロー
 
-```
-HTTP Request
-     ↓
-Presentation (Controller)
-     ↓ バリデーション & マッピング
-Application (UseCase)
-     ↓ 
-Domain (Entity)
-     ↓ ビジネスロジック実行
-Infrastructure (Repository, Service)
-     ↓
-    DB
+```mermaid
+flowchart TD
+    A["HTTP Request"] --> B["Presentation (Controller)"]
+    B -->|バリデーション & マッピング| C["Application (UseCase)"]
+    C --> D["Domain (Entity)"]
+    D -->|ビジネスロジック実行| E["Infrastructure (Repository, Service)"]
+    E --> F["DB"]
 ```
 
 ---
@@ -125,29 +118,15 @@ Infrastructure (Repository, Service)
 
 ## 🎬 実装フロー
 
-```
-1️⃣  プロジェクト構造を作成
-     └─ フォルダ/ファイル配置
-     
-2️⃣  ドメインエンティティを定義
-     └─ User, Password, Email等
-     
-3️⃣  リポジトリインターフェース定義
-     └─ UserRepository etc.
-     
-4️⃣  ユースケースを実装
-     └─ RegisterUser, GetUser等
-     
-5️⃣  Controller を実装
-     └─ HTTP エンドポイント
-     
-6️⃣  リポジトリ実装
-     └─ MySQL 実装
-     
-7️⃣  テストを書く
-     └─ ユニット、統合テスト
-     
-8️⃣  起動して動作確認
+```mermaid
+flowchart TD
+    A["1️⃣ プロジェクト構造を作成<br/>└─ フォルダ/ファイル配置"] --> B["2️⃣ ドメインエンティティを定義<br/>└─ User, Password, Email等"]
+    B --> C["3️⃣ リポジトリインターフェース定義<br/>└─ UserRepository etc."]
+    C --> D["4️⃣ ユースケースを実装<br/>└─ RegisterUser, GetUser等"]
+    D --> E["5️⃣ Controller を実装<br/>└─ HTTP エンドポイント"]
+    E --> F["6️⃣ リポジトリ実装<br/>└─ MySQL 実装"]
+    F --> G["7️⃣ テストを書く<br/>└─ ユニット、統合テスト"]
+    G --> H["8️⃣ 起動して動作確認"]
 ```
 
 ---

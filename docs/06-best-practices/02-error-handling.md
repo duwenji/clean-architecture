@@ -6,33 +6,29 @@
 
 ## 🎯 エラーハンドリングの原則
 
-```
-予測可能：何が起きるか分かる
-│
-回復可能：対応方法が存在する
-│
-可視化：ログ・監視に記録
+```mermaid
+flowchart TD
+    A["予測可能：何が起きるか分かる"] --> B["回復可能：対応方法が存在する"]
+    B --> C["可視化：ログ・監視に記録"]
 ```
 
 ---
 
 ## 🔴 エラーの分類
 
-```
-ドメイン層エラー（ビジネスエラー）
-  ├─ 回復可能なエラー
-  ├─ ユースケース側で処理
-  └─ 例: InvalidEmailError, InsufficientBalanceError
+```mermaid
+flowchart TD
+    A["ドメイン層エラー<br/>（ビジネスエラー）"] --> A1["回復可能なエラー"]
+    A --> A2["ユースケース側で処理"]
+    A --> A3["例: InvalidEmailError, InsufficientBalanceError"]
 
-アプリケーション層エラー（ロジックエラー）
-  ├─ ユースケース実行の問題
-  ├─ トランザクション失敗
-  └─ 例: UserAlreadyExistsError, DataConsistencyError
+    B["アプリケーション層エラー<br/>（ロジックエラー）"] --> B1["ユースケース実行の問題"]
+    B --> B2["トランザクション失敗"]
+    B --> B3["例: UserAlreadyExistsError, DataConsistencyError"]
 
-システムエラー（インフラエラー）
-  ├─ 回復困難なエラー
-  ├─ 外部依存の失敗
-  └─ 例: DatabaseConnectionError, ExternalAPIError
+    C["システムエラー<br/>（インフラエラー）"] --> C1["回復困難なエラー"]
+    C --> C2["外部依存の失敗"]
+    C --> C3["例: DatabaseConnectionError, ExternalAPIError"]
 ```
 
 ---

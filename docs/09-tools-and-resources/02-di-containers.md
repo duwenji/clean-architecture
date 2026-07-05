@@ -358,28 +358,24 @@ user_service = container.user_service()
 
 ## 🎯 選定フロー
 
-```
-プロジェクトでDI容器を選ぶ
-│
-├─ TypeScript プロジェクト？
-│  ├─ 小規模・Express
-│  │  └─> Type-DI ✅
-│  │
-│  ├─ 中規模・複雑
-│  │  └─> InversifyJS or Awilix ✅
-│  │
-│  └─ 大規模・NestJS
-│     └─> NestJS組込DI ✅
-│
-├─ Java プロジェクト？
-│  ├─ Spring Boot
-│  │  └─> Spring DI ✅
-│  │
-│  └─ 軽量志向
-│     └─> Guice ✅
-│
-└─ Python プロジェクト？
-   └─> dependency-injector ✅
+```mermaid
+flowchart TD
+    Start["プロジェクトでDI容器を選ぶ"] --> TS{"TypeScript プロジェクト？"}
+    TS --> TS1["小規模・Express"]
+    TS1 --> TD1["Type-DI ✅"]
+    TS --> TS2["中規模・複雑"]
+    TS2 --> TD2["InversifyJS or Awilix ✅"]
+    TS --> TS3["大規模・NestJS"]
+    TS3 --> TD3["NestJS組込DI ✅"]
+
+    Start --> JV{"Java プロジェクト？"}
+    JV --> J1["Spring Boot"]
+    J1 --> JD1["Spring DI ✅"]
+    JV --> J2["軽量志向"]
+    J2 --> JD2["Guice ✅"]
+
+    Start --> PY{"Python プロジェクト？"}
+    PY --> PD1["dependency-injector ✅"]
 ```
 
 ---

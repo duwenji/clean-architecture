@@ -460,21 +460,18 @@ bootstrap();
 
 ## 🔄 層間の依存関係
 
-```
-          Presentation
-               ↓
-          Application
-               ↓
-            Domain
-               ↓
-         Infrastructure
+```mermaid
+flowchart TD
+    A["Presentation"] --> B["Application"]
+    B --> C["Domain"]
+    D["Infrastructure"] -->|インターフェース経由| C
 ```
 
 **重要ルール:**
 
 - 上位層 → 下位層への依存は OK
 - 下位層 → 上位層への依存は NG
-- Infrastructure は他層に依存しない（インターフェース経由で逆転）
+- Infrastructure はドメイン層のインターフェースを実装する形で依存する（依存性逆転）。Domain 自身は他のどの層にも依存しない
 
 ---
 
