@@ -17,16 +17,10 @@
 
 ### 🔑 核となる考え方
 
-```
-ビジネスロジック（ドメイン）
-       ↑
-   (依存する)
-       ↓
-アプリケーションロジック（ユースケース）
-       ↑
-   (依存する)
-       ↓
-外部フレームワーク・ツール（DB、Web、API）
+```mermaid
+flowchart TD
+    C["外部フレームワーク・ツール（DB、Web、API）"] -->|依存する| B["アプリケーションロジック（ユースケース）"]
+    B -->|依存する| A["ビジネスロジック（ドメイン）"]
 ```
 
 **重要**: 外側が内側に依存する（内側は外側に依存しない）
@@ -37,23 +31,11 @@
 
 ### クリーンアーキテクチャの4層構造
 
-```
-┌────────────────────────────────────┐
-│    プレゼンテーション層              │
-│  (UI, Web Controller, API, CLI)    │
-│────────────────────────────────────│
-│      アプリケーション層              │
-│   (ユースケース, サービス)          │
-│────────────────────────────────────│
-│        ドメイン層                    │
-│   (エンティティ, ビジネスロジック)  │
-│────────────────────────────────────│
-│    インフラストラクチャ層            │
-│  (DB, 外部API, ファイルシステム)   │
-└────────────────────────────────────┘
-
-      ↑
-  依存の方向
+```mermaid
+flowchart TD
+    Pres["プレゼンテーション層<br/>(UI, Web Controller, API, CLI)"] -->|依存する| App["アプリケーション層<br/>(ユースケース, サービス)"]
+    App -->|依存する| Dom["ドメイン層<br/>(エンティティ, ビジネスロジック)"]
+    Infra["インフラストラクチャ層<br/>(DB, 外部API, ファイルシステム)"] -->|依存する（インターフェース経由）| Dom
 ```
 
 ---
@@ -68,55 +50,44 @@ class UserController {
   createUser(req, res) {
     // DBに直接接続
     const db = new Database();
-    
+  
     // ビジネスロジックとUIが混在
     if (!req.body.email) {
       res.status(400).send('メール必須');
       return;
     }
-    
+  
     const user = {
       id: Math.random(),
       email: req.body.email,
       password: req.body.password,
       createdAt: new Date()
     };
-    
+  
     // DBに直接保存
     db.insert('users', user);
-    
+  
     res.json(user);
   }
 }
 ```
 
 **問題点:**
+
 - ❌ UI層（Controller）にビジネスロジック混在
 - ❌ DBに強く依存している
 - ❌ テストが困難（DBが必要）
-- ❌ 変更に弱い（DBを変更したらテスト全体が影響）
+- ❌ 変更に弱い（DBを変更したらテスト全体に影響が出る）
 
 ---
 
 ### ✅ クリーンアーキテクチャ設計
 
-```
-プレゼンテーション層（外側）
-      ↓
-   controller.ts  ← HTTPリクエストを受け取る
-      ↓
-アプリケーション層
-      ↓
-   CreateUserUseCase.ts  ← ビジネスロジック実行
-      ↓
-ドメイン層
-      ↓
-   User エンティティ  ← ビジネスルール
-   UserRepository インターフェース
-      ↓
-インフラストラクチャ層（内側）
-      ↓
-   MySQLUserRepository.ts  ← 実装詳細
+```mermaid
+flowchart TD
+    A["プレゼンテーション層（外側）<br/>controller.ts<br/>← HTTPリクエストを受け取る"] --> B["アプリケーション層<br/>CreateUserUseCase.ts<br/>← ビジネスロジック実行"]
+    B --> C["ドメイン層（最も内側）<br/>User エンティティ ← ビジネスルール<br/>UserRepository インターフェース"]
+    C -.->|実行時にインターフェース経由で呼ばれる| D["インフラストラクチャ層（外側・実装詳細）<br/>MySQLUserRepository.ts<br/>← 実装詳細"]
 ```
 
 #### **ドメイン層** - ビジネスルール
@@ -134,7 +105,7 @@ export class User {
     if (!this.isValidEmail(email)) {
       throw new Error('Invalid email format');
     }
-    
+  
     this.id = id;
     this.email = email;
     this.password = password;
@@ -201,7 +172,7 @@ export class UserController {
         email: req.body.email,
         password: req.body.password
       });
-      
+    
       res.status(201).json(result);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -229,9 +200,9 @@ export class MySQLUserRepository implements UserRepository {
       'SELECT * FROM users WHERE email = ?',
       [email]
     );
-    
+  
     if (!row) return null;
-    
+  
     return new User(row.id, row.email, row.password);
   }
 }
@@ -241,14 +212,14 @@ export class MySQLUserRepository implements UserRepository {
 
 ## 📈 メリットの比較表
 
-| 項目 | 従来設計 | クリーンアーキテクチャ |
-|-----|--------|------------------|
-| **テスト** | DB必須、遅い | モック使用、高速 |
-| **変更对応** | 影響大きい | 局所的な影響 |
-| **ビジネスロジック** | 複数の層に散在 | ドメイン層に集約 |
-| **再利用性** | 低い | 高い |
-| **保守性** | 困難 | 容易 |
-| **学習曲線** | 浅い | 深い（最初） |
+| 項目                       | 従来設計       | クリーンアーキテクチャ |
+| -------------------------- | -------------- | ---------------------- |
+| **テスト**           | DB必須、遅い   | モック使用、高速       |
+| **変更対応**         | 影響大きい     | 局所的な影響           |
+| **ビジネスロジック** | 複数の層に散在 | ドメイン層に集約       |
+| **再利用性**         | 低い           | 高い                   |
+| **保守性**           | 困難           | 容易                   |
+| **学習曲線**         | 浅い           | 深い（最初）           |
 
 ---
 
@@ -315,12 +286,27 @@ describe('CreateUserUseCase', () => {
 
 ## 📋 まとめ
 
-| ポイント | 説明 |
-|---------|------|
-| **本質** | 関心事の分離と依存方向の制御 |
+| ポイント          | 説明                                                    |
+| ----------------- | ------------------------------------------------------- |
+| **本質**    | 関心事の分離と依存方向の制御                            |
 | **4層構造** | Presentation → Application → Domain → Infrastructure |
-| **依存性** | 外→内（内は外に依存しない） |
-| **目的** | テスト性、保守性、再利用性の向上 |
+| **依存性**  | 外→内（内は外に依存しない）                            |
+| **目的**    | テスト性、保守性、再利用性の向上                        |
+
+---
+
+### 🔍 原典（Uncle Bob）の4重円との関係
+
+本ガイドの4層（Presentation/Application/Domain/Infrastructure）は、実務でよく使われる簡略版です。
+Robert C. Martin の原典「The Clean Architecture」では Entities / Use Cases / Interface Adapters /
+Frameworks and Drivers の4重円で説明されており、対応の目安は次の通りです。
+
+| 本ガイドの4層 | 原典の4重円（目安） |
+|---|---|
+| プレゼンテーション層 | Interface Adapters（Controller/View） |
+| アプリケーション層 | Use Cases |
+| ドメイン層 | Entities |
+| インフラストラクチャ層 | Frameworks and Drivers ＋ Interface Adapters（Repository実装等） |
 
 ---
 
