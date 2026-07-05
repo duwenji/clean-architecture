@@ -142,7 +142,7 @@ UserService service = injector.getInstance(UserService.class);
 ```typescript
 // Node.js
 ┌─ Jest （推奨）
-│  ✅ マッ ク機能組み込み
+│  ✅ モック機能組み込み
 │  ✅ Snapshot テスト対応
 │  ✅ カバレッジ自動計算
 │  例: npm test -- --coverage
@@ -313,7 +313,7 @@ graphql-codegen --config codegen.yml
    推奨: 最初に読むべき書籍
 
 2️⃣ 「Domain-Driven Design」Eric Evans
-   出版: 2003年（新版:2014）
+   出版: 2003年
    言語: 英語・日本語
    内容: ドメイン層の設計・言語化
    推奨: ドメイン複雑度が高い場合
@@ -360,16 +360,16 @@ graphql-codegen --config codegen.yml
 
 ```
 ⭐ clean-architecture-manga
-   https://github.com/joeyhu/clean-architecture-manga
-   内容: マンガで学ぶ Clean Architecture
+   https://github.com/ivanpaulovich/clean-architecture-manga
+   内容: .NET 6 + React/Redux によるクリーンアーキテクチャ実装例
 
-⭐ node-ts-ddd-boilerplate
-   https://github.com/Gotham/node-ts-ddd-boilerplate
-   内容: TypeScript + DDD テンプレート
+⭐ typescript-clean-architecture
+   https://github.com/pvarentsov/typescript-clean-architecture
+   内容: TypeScript + NestJS + TypeORM の実装例
 
-⭐ nestjs-clean-architecture
+⭐ clean-node-api
    https://github.com/rmanguinho/clean-node-api
-   内容: NestJS + Clean Architecture 完全例
+   内容: Node.js（JavaScript）+ Clean Architecture の実装例
 ```
 
 ---
@@ -380,7 +380,7 @@ graphql-codegen --config codegen.yml
 
 ```
 💬 DDD Community Slack
-   https://ddd-community.slack.com/
+   dddcommunity.org 等から招待リンクを確認
 
 💬 Node.js Japan ユーザグループ
    https://nodefest.jp/
@@ -402,7 +402,7 @@ graphql-codegen --config codegen.yml
    内容: アーキテクチャ・システム設計
 
 🎉 DDD Europe
-   https://ddd-eu.com/
+   https://dddeurope.com/
    期間: 毎年10月
 ```
 

@@ -79,7 +79,7 @@ https://amazon.co.jp/s?k=Domain-Driven+Design+Eric+Evans
 → マイクロサービス化を検討する場面
 
 Amazon リンク：
-https://amazon.co.jp/Building-Microservices-Sam-Newman/dp/4873117606
+https://amazon.co.jp/s?k=Building+Microservices+Sam+Newman
 ```
 
 ### 番外編：「Refactoring」Martin Fowler
@@ -121,25 +121,13 @@ https://amazon.co.jp/Building-Microservices-Sam-Newman/dp/4873117606
 - 4時間のビデオ
 - 演習付き
 
-Link: https://www.udemy.com/course/clean-code-in-javascript/
-
----
-
-コース2: "Microservices Architecture"
-講師: Sam Newman (提供フォーマット: Pluralsight)
-対象: Java / Go / Python
-推奨度: ⭐⭐⭐⭐★
-
-特徴：
-- マイクロサービス設計
-- 実装パターン
-- トラブルシューティング
+Link: https://www.udemy.com/courses/search/?q=Clean%20Architecture
 ```
 
 ### Pluralsight
 
 ```
-コース: "Clean Code: Writing Code for Humans"
+コース1: "Clean Code: Writing Code for Humans"
 講師: Cory House
 対象: C# / Java / JavaScript
 推奨度: ⭐⭐⭐⭐★
@@ -149,6 +137,18 @@ Link: https://www.udemy.com/course/clean-code-in-javascript/
 - テスト駆動開発
 - リファクタリング
 - 実装例豊富
+
+---
+
+コース2: "Microservices Architecture"
+講師: Sam Newman
+対象: Java / Go / Python
+推奨度: ⭐⭐⭐⭐★
+
+特徴：
+- マイクロサービス設計
+- 実装パターン
+- トラブルシューティング
 ```
 
 ---
@@ -191,7 +191,7 @@ URL: https://martinfowler.com/
 ### DDD Community
 
 ```
-URL: https://ddd-community.org/
+URL: https://dddcommunity.org/
 
 コンテンツ：
 - Domain-Driven Design の解説
@@ -214,16 +214,16 @@ URL: https://ddd-community.org/
 #### ① clean-architecture-manga
 
 ```
-Repository: https://github.com/joeyhu/clean-architecture-manga
+Repository: https://github.com/ivanpaulovich/clean-architecture-manga
 
 特徴：
-- マンガで Learn Clean Architecture
-- 視覚的に理解しやすい
-- ビギナー向け
-- 言語: 日本語
+- .NET 6 / C# 10 + React + Redux による実装例（アプリ名が「Manga」）
+- ユースケースを中心とした構成、フレームワークから独立
+- テスト容易性を重視した設計
+- 言語: 英語
 ```
 
-#### ② nestjs-clean-architecture-example
+#### ② clean-node-api
 
 ```
 Repository: https://github.com/rmanguinho/clean-node-api
@@ -231,7 +231,7 @@ Repository: https://github.com/rmanguinho/clean-node-api
 特徴：
 - Node.js + Express + Clean Architecture
 - 完全な実装例
-- テストカバレッジ 100%
+- テストカバレッジ計測（Coveralls連携）
 - CI/CD パイプライン
 
 フォルダ構造：
@@ -242,24 +242,20 @@ src/
 ├─ main/（Bootstrap）
 └─ validation/
 
-対象: TypeScript/JavaScript
+対象: JavaScript
 ```
 
-#### ③ typescript-clean-architecture-examples
+#### ③ typescript-clean-architecture
 
 ```
-Repository: https://github.com/wanghao1993/clean-architecture-typescript
+Repository: https://github.com/pvarentsov/typescript-clean-architecture
 
 特徴：
-- TypeScript native
-- 複数のドメイン例
-- マイクロサービス例
-- Docker 設定
+- TypeScript + NestJS + TypeORM
+- 投稿・メディア管理アプリを題材にした実装例
+- レイヤー分割の参考実装
 
-提供例：
-- 基本的な CRUD
-- ユーザー管理
-- 注文処理
+対象: TypeScript/NestJS
 ```
 
 ### プロジェクト生成コマンド
@@ -284,12 +280,12 @@ nest generate service domain/users/user.service
 ```
 Slack チャンネル：
 - DDD Community Slack
-  → https://ddd-community.slack.com/
+  → dddcommunity.org 等から招待リンクを確認
   メンバー: 12,000+ (2024)
 
 Discord サーバー：
 - Node.js Japan
-  → https://discord.gg/invite-link
+  → 公式サイト・SNS で招待リンクを確認
   主催: Node.js コミュニティ
 
 Reddit（英語）：
@@ -348,13 +344,13 @@ Reddit（英語）：
 📅 DDD Europe
    会期: 毎年10月
    開催地: バルセロナ（オンライン開催も）
-   URL: https://ddd-eu.com/
+   URL: https://dddeurope.com/
    特徴: Domain-Driven Design 専門
 
 📅 GOTO Conferences
    会期: 通年開催
    開催地: 複数地点
-   URL: https://goto.con/
+   URL: https://gotocon.com/
    特徴: トップエンジニアの講演
 ```
 

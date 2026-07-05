@@ -302,7 +302,7 @@ npm install --save-dev eslint @typescript-eslint/eslint-plugin @typescript-eslin
 npx eslint src/**/*.ts
 ```
 
-### 循環依存检出：madge
+### 循環依存検出：madge
 
 ```bash
 npm install --save-dev madge
