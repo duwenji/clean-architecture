@@ -117,8 +117,10 @@ export class User {
   private createdAt: Date;
 
   // ビジネスロジック
-  isPasswordCorrect(plainPassword: string): boolean {
-    return this.password.matches(plainPassword);
+  // 注意: パスワード照合は IPasswordHasher.compare() を使い Application 層（UseCase）が行う。
+  // Domain 層はハッシュ化済み値を保持するのみで、照合ロジックは持たない（詳細は 02-entity-design.md を参照）
+  getHashedPassword(): string {
+    return this.password.getHashedValue();
   }
 
   updateProfile(name: string, email: Email): void {
@@ -181,7 +183,8 @@ export interface IUserRepository {
 export class RegisterUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private emailSendingService: IEmailSendingService
+    private emailSendingService: IEmailSendingService,
+    private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<void> {
@@ -193,18 +196,23 @@ export class RegisterUserUseCase {
       throw new UserAlreadyExistsError();
     }
 
-    // 2. ドメインオブジェクト生成（パスワードの強度チェック・ハッシュ化は
-    //    Password 値オブジェクトが内部で行う。詳細は 02-entity-design.md を参照）
+    // 2. パスワード強度チェック（ドメインルール）とハッシュ化
+    //    bcrypt 等の実装詳細は IPasswordHasher 経由で Infrastructure 層に隔離する。
+    //    詳細は 02-entity-design.md / 03-usecase-design.md を参照
+    Password.validateStrength(request.password);
+    const hashedPassword = await this.passwordHasher.hash(request.password);
+
+    // 3. ドメインオブジェクト生成（ハッシュ済みパスワードを渡す）
     const user = await User.create(
       new Email(request.email),
-      request.password,
+      hashedPassword,
       request.name
     );
 
-    // 3. リポジトリで保存
+    // 4. リポジトリで保存
     await this.userRepository.save(user);
 
-    // 4. 副作用（メール送信）
+    // 5. 副作用（メール送信）
     await this.emailSendingService.send(
       request.email,
       "ユーザー登録完了",
@@ -318,7 +326,7 @@ export class UserRepository implements IUserRepository {
       [
         user.getId(),
         user.getEmail().getValue(),
-        user.getPassword(),
+        user.getHashedPassword(),
         user.getName(),
         user.getCreatedAt()
       ]
@@ -335,12 +343,16 @@ export class UserRepository implements IUserRepository {
   }
 
   private mapRowToUser(row: any): User {
-    return new User(
+    // User のコンストラクタは private なので、DB からの復元は
+    // User.reconstruct() ファクトリメソッド経由で行う（詳細は 02-entity-design.md を参照）
+    return User.reconstruct(
       row.id,
       new Email(row.email),
       row.password,
       row.name,
-      new Date(row.created_at)
+      new Date(row.created_at),
+      new Date(row.updated_at),
+      row.is_active === 1
     );
   }
 }
@@ -393,10 +405,11 @@ export class Container {
   registerRegisterUserUseCase(): void {
     const userRepository = this.instances.get("UserRepository");
     const emailService = this.instances.get("EmailSendingService");
+    const passwordHasher = this.instances.get("PasswordHasher");
 
     this.instances.set(
       "RegisterUserUseCase",
-      new RegisterUserUseCase(userRepository, emailService)
+      new RegisterUserUseCase(userRepository, emailService, passwordHasher)
     );
   }
 

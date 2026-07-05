@@ -130,7 +130,8 @@ export interface IPasswordHasher {
 export class RegisterUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private emailSendingService: IEmailSendingService
+    private emailSendingService: IEmailSendingService,
+    private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<RegisterUserResponse> {
@@ -145,19 +146,24 @@ export class RegisterUserUseCase {
       );
     }
 
-    // 2. ドメインオブジェクト生成
-    // Email と Password は値オブジェクトで validation 済み
-    const email = new Email(request.email);
-    const user = await User.create(email, request.password, request.name);
+    // 2. パスワード強度チェック（ドメインルール）とハッシュ化
+    //    bcrypt 等の実装詳細は IPasswordHasher 経由で Infrastructure 層に隔離する
+    Password.validateStrength(request.password);
+    const hashedPassword = await this.passwordHasher.hash(request.password);
 
-    // 3. リポジトリで永続化
+    // 3. ドメインオブジェクト生成
+    // Email は値オブジェクトで validation 済み、Password はハッシュ済み文字列を渡してラップする
+    const email = new Email(request.email);
+    const user = await User.create(email, hashedPassword, request.name);
+
+    // 4. リポジトリで永続化
     try {
       await this.userRepository.save(user);
     } catch (error) {
       throw new UserSaveError(`Failed to save user: ${error.message}`);
     }
 
-    // 4. 副作用：メール送信
+    // 5. 副作用：メール送信
     try {
       await this.emailSendingService.send(
         request.email,
@@ -169,7 +175,7 @@ export class RegisterUserUseCase {
       console.warn(`Failed to send welcome email: ${error.message}`);
     }
 
-    // 5. レスポンス返却
+    // 6. レスポンス返却
     return new RegisterUserResponse(user.getId());
   }
 }
@@ -196,7 +202,8 @@ export class LoginUserResponse {
 export class LoginUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private tokenGenerator: ITokenGenerator
+    private tokenGenerator: ITokenGenerator,
+    private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
@@ -209,8 +216,12 @@ export class LoginUserUseCase {
       throw new UserNotFoundError(`User not found: ${request.email}`);
     }
 
-    // 2. パスワード検証
-    const passwordMatches = await user.isPasswordMatches(request.password);
+    // 2. パスワード検証（IPasswordHasher 経由。bcrypt 等の実装詳細は
+    //    Infrastructure 層に隔離し、Domain/Application 層はこれに依存しない）
+    const passwordMatches = await this.passwordHasher.compare(
+      request.password,
+      user.getHashedPassword()
+    );
 
     if (!passwordMatches) {
       throw new InvalidPasswordError("Password is incorrect");
@@ -386,6 +397,8 @@ export class UserController {
       res.status(404).json({ error: error.message });
     } else if (error instanceof InvalidPasswordError) {
       res.status(401).json({ error: error.message });
+    } else if (error instanceof UserDeactivatedError) {
+      res.status(403).json({ error: "アカウントが無効化されています" });
     } else {
       res.status(500).json({ error: "Internal server error" });
     }
