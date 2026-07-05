@@ -75,16 +75,16 @@ describe('User', () => {
 ### 原則：依存は下位層（抽象度↑）へ
 
 ```
-Presentation → Application → Domain ↔ Infrastructure
+Presentation → Application → Domain ← Infrastructure
                                 ↑
                              依存の向き
 ```
 
 **各層で参照可能なもの：**
-- Presentation: Application + Infrastructure
-- Application: Domain + Infrastructure
+- Presentation: Application のみ
+- Application: Domain のみ
 - Domain: Domain のみ（他層は参照禁止）
-- Infrastructure: 外部ライブラリ
+- Infrastructure: Domain（インターフェースを実装するため依存）+ 外部ライブラリ
 
 ### 実装例：インターフェース経由
 

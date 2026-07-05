@@ -82,7 +82,7 @@ const pool = new Pool({
   database: 'app'
 });
 
-// ユーザー列表
+// ユーザー一覧
 app.get('/users', async (req, res) => {
   const [rows] = await pool.query('SELECT id, email FROM users');
   res.json(rows);

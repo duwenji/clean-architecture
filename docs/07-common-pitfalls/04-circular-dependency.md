@@ -34,9 +34,11 @@ import { User } from './User';  // ← User を参照（循環！）
 
 export class Account {
   owner: User;
+  balance: number;
 
-  constructor(owner: User) {
+  constructor(owner: User, balance: number = 0) {
     this.owner = owner;
+    this.balance = balance;
     owner.accounts.push(this);  // 双方向参照
   }
 
@@ -316,10 +318,10 @@ Presentation → Application → Domain ← Infrastructure
 ```
 
 **各層が参照可能：**
-- Presentation: Application, Infrastructure
-- Application: Domain, Infrastructure
+- Presentation: Application のみ
+- Application: Domain のみ
 - Domain: Domain のみ
-- Infrastructure: 外部ライブラリのみ
+- Infrastructure: Domain（インターフェースを実装するため依存）+ 外部ライブラリのみ
 
 ### ❌ 悪いパターン（循環）
 
