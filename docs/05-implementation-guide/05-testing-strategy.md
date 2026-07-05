@@ -85,71 +85,47 @@ describe("Email Value Object", () => {
 import { Password } from "../../../../src/domain/value-objects/Password";
 import { InvalidPasswordError } from "../../../../src/domain/errors/DomainError";
 
+// bcrypt 等でハッシュ化済みの文字列を模したテスト用ダミー値（60文字、実際のハッシュ化は
+// IPasswordHasher の実装＝Infrastructure 層が担当するため、Domain 層のテストではハッシュ化
+// 処理そのものは検証しない）
+const DUMMY_HASHED_PASSWORD = "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+
 describe("Password Value Object", () => {
-  describe("fromPlainText", () => {
-    it("should create password from valid plain text", async () => {
-      const password = await Password.fromPlainText("ValidPassword123");
-      expect(password).toBeDefined();
-      expect(password.getHashedValue().length).toBeGreaterThan(50);
+  describe("validateStrength", () => {
+    it("should not throw for a strong password", () => {
+      expect(() => Password.validateStrength("ValidPassword123")).not.toThrow();
     });
 
-    it("should hash password using bcrypt", async () => {
-      const password1 = await Password.fromPlainText("TestPassword123");
-      const password2 = await Password.fromPlainText("TestPassword123");
-
-      // ハッシュは毎回異なる（salt が異なる）
-      expect(password1.getHashedValue()).not.toBe(
-        password2.getHashedValue()
-      );
-    });
-
-    it("should throw error for weak password", async () => {
+    it("should throw error for weak password", () => {
       // 8文字未満
-      await expect(
-        Password.fromPlainText("weak")
-      ).rejects.toThrow(InvalidPasswordError);
+      expect(() => Password.validateStrength("weak")).toThrow(
+        InvalidPasswordError
+      );
 
       // 大文字なし
-      await expect(
-        Password.fromPlainText("weakpassword123")
-      ).rejects.toThrow(InvalidPasswordError);
+      expect(() => Password.validateStrength("weakpassword123")).toThrow(
+        InvalidPasswordError
+      );
 
       // 小文字なし
-      await expect(
-        Password.fromPlainText("WEAKPASSWORD123")
-      ).rejects.toThrow(InvalidPasswordError);
+      expect(() => Password.validateStrength("WEAKPASSWORD123")).toThrow(
+        InvalidPasswordError
+      );
 
       // 数字なし
-      await expect(
-        Password.fromPlainText("WeakPassword")
-      ).rejects.toThrow(InvalidPasswordError);
-    });
-  });
-
-  describe("matches", () => {
-    it("should return true for correct password", async () => {
-      const password = await Password.fromPlainText("CorrectPassword123");
-      expect(await password.matches("CorrectPassword123")).toBe(true);
-    });
-
-    it("should return false for incorrect password", async () => {
-      const password = await Password.fromPlainText("CorrectPassword123");
-      expect(await password.matches("IncorrectPassword123")).toBe(false);
+      expect(() => Password.validateStrength("WeakPassword")).toThrow(
+        InvalidPasswordError
+      );
     });
   });
 
   describe("fromHash", () => {
-    it("should create password from hash", async () => {
-      const originalPassword = await Password.fromPlainText(
-        "TestPassword123"
-      );
-      const hash = originalPassword.getHashedValue();
-
-      const reconstructed = Password.fromHash(hash);
-      expect(await reconstructed.matches("TestPassword123")).toBe(true);
+    it("should create password from an already-hashed value", () => {
+      const password = Password.fromHash(DUMMY_HASHED_PASSWORD);
+      expect(password.getHashedValue()).toBe(DUMMY_HASHED_PASSWORD);
     });
 
-    it("should throw error for invalid hash", () => {
+    it("should throw error for invalid (too short) hash", () => {
       expect(() => Password.fromHash("invalid")).toThrow(InvalidPasswordError);
     });
   });
@@ -162,13 +138,17 @@ describe("Password Value Object", () => {
 // tests/unit/domain/entities/User.test.ts
 import { User } from "../../../../src/domain/entities/User";
 import { Email } from "../../../../src/domain/value-objects/Email";
-import { Password } from "../../../../src/domain/value-objects/Password";
+
+// User.create / reconstruct はハッシュ化済みパスワードを受け取る（平文の強度チェックと
+// ハッシュ化は Application 層の UseCase が Password.validateStrength() と
+// IPasswordHasher.hash() で行う）ため、テストでは事前にハッシュ化済みの体で扱うダミー値を使う
+const DUMMY_HASHED_PASSWORD = "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
 
 describe("User Entity", () => {
   describe("create", () => {
     it("should create user with valid data", async () => {
       const email = new Email("john@example.com");
-      const user = await User.create(email, "ValidPassword123", "John Doe");
+      const user = await User.create(email, DUMMY_HASHED_PASSWORD, "John Doe");
 
       expect(user.getId()).toBeDefined();
       expect(user.getEmail().getValue()).toBe("john@example.com");
@@ -181,13 +161,13 @@ describe("User Entity", () => {
 
       // 1文字
       await expect(
-        User.create(email, "ValidPassword123", "J")
+        User.create(email, DUMMY_HASHED_PASSWORD, "J")
       ).rejects.toThrow();
 
       // 101文字
       const longName = "A".repeat(101);
       await expect(
-        User.create(email, "ValidPassword123", longName)
+        User.create(email, DUMMY_HASHED_PASSWORD, longName)
       ).rejects.toThrow();
     });
 
@@ -195,34 +175,21 @@ describe("User Entity", () => {
       const email1 = new Email("user1@example.com");
       const email2 = new Email("user2@example.com");
 
-      const user1 = await User.create(email1, "ValidPassword123", "User One");
-      const user2 = await User.create(email2, "ValidPassword123", "User Two");
+      const user1 = await User.create(email1, DUMMY_HASHED_PASSWORD, "User One");
+      const user2 = await User.create(email2, DUMMY_HASHED_PASSWORD, "User Two");
 
       expect(user1.getId()).not.toBe(user2.getId());
     });
   });
 
-  describe("isPasswordMatches", () => {
-    it("should return true for correct password", async () => {
+  describe("getHashedPassword", () => {
+    it("should return the hashed password it was created with", async () => {
       const email = new Email("john@example.com");
-      const user = await User.create(
-        email,
-        "CorrectPassword123",
-        "John Doe"
-      );
+      const user = await User.create(email, DUMMY_HASHED_PASSWORD, "John Doe");
 
-      expect(await user.isPasswordMatches("CorrectPassword123")).toBe(true);
-    });
-
-    it("should return false for incorrect password", async () => {
-      const email = new Email("john@example.com");
-      const user = await User.create(
-        email,
-        "CorrectPassword123",
-        "John Doe"
-      );
-
-      expect(await user.isPasswordMatches("IncorrectPassword123")).toBe(false);
+      // User はハッシュ済みの値をそのまま保持するのみ。実際の照合は
+      // IPasswordHasher.compare() を使う Application 層の責務（LoginUserUseCase テスト参照）
+      expect(user.getHashedPassword()).toBe(DUMMY_HASHED_PASSWORD);
     });
   });
 
@@ -230,7 +197,7 @@ describe("User Entity", () => {
     it("should reconstruct user from database data", async () => {
       const originalUser = await User.create(
         new Email("john@example.com"),
-        "ValidPassword123",
+        DUMMY_HASHED_PASSWORD,
         "John Doe"
       );
 
@@ -245,7 +212,7 @@ describe("User Entity", () => {
       );
 
       expect(reconstructed.getId()).toBe(originalUser.getId());
-      expect(await reconstructed.isPasswordMatches("ValidPassword123")).toBe(true);
+      expect(reconstructed.getHashedPassword()).toBe(DUMMY_HASHED_PASSWORD);
     });
   });
 });
@@ -269,6 +236,7 @@ import { RegisterUserUseCase } from "../../../../src/application/usecases/Regist
 import { RegisterUserRequest } from "../../../../src/application/dtos/RegisterUserRequest";
 import { IUserRepository } from "../../../../src/domain/interfaces/IUserRepository";
 import { IEmailSendingService } from "../../../../src/application/interfaces/IEmailSendingService";
+import { IPasswordHasher } from "../../../../src/application/interfaces/IPasswordHasher";
 import { User } from "../../../../src/domain/entities/User";
 import { Email } from "../../../../src/domain/value-objects/Email";
 import { UserAlreadyExistsError } from "../../../../src/domain/errors/DomainError";
@@ -305,15 +273,31 @@ class MockEmailSendingService implements IEmailSendingService {
   }
 }
 
+class MockPasswordHasher implements IPasswordHasher {
+  async hash(plainPassword: string): Promise<string> {
+    return `hashed_${plainPassword}`;
+  }
+
+  async compare(plainPassword: string, hash: string): Promise<boolean> {
+    return hash === `hashed_${plainPassword}`;
+  }
+}
+
 describe("RegisterUserUseCase", () => {
   let useCase: RegisterUserUseCase;
   let userRepository: MockUserRepository;
   let emailSendingService: MockEmailSendingService;
+  let passwordHasher: MockPasswordHasher;
 
   beforeEach(() => {
     userRepository = new MockUserRepository();
     emailSendingService = new MockEmailSendingService();
-    useCase = new RegisterUserUseCase(userRepository, emailSendingService);
+    passwordHasher = new MockPasswordHasher();
+    useCase = new RegisterUserUseCase(
+      userRepository,
+      emailSendingService,
+      passwordHasher
+    );
   });
 
   it("should register new user successfully", async () => {
@@ -394,6 +378,7 @@ import { LoginUserUseCase } from "../../../../src/application/usecases/LoginUser
 import { LoginUserRequest } from "../../../../src/application/dtos/LoginUserRequest";
 import { IUserRepository } from "../../../../src/domain/interfaces/IUserRepository";
 import { ITokenGenerator } from "../../../../src/application/interfaces/ITokenGenerator";
+import { IPasswordHasher } from "../../../../src/application/interfaces/IPasswordHasher";
 import { User } from "../../../../src/domain/entities/User";
 import { Email } from "../../../../src/domain/value-objects/Email";
 import { InvalidCredentialsError } from "../../../../src/application/errors/ApplicationError";
@@ -408,20 +393,34 @@ class MockTokenGenerator implements ITokenGenerator {
   }
 }
 
+class MockPasswordHasher implements IPasswordHasher {
+  async hash(plainPassword: string): Promise<string> {
+    return `hashed_${plainPassword}`;
+  }
+
+  async compare(plainPassword: string, hash: string): Promise<boolean> {
+    return hash === `hashed_${plainPassword}`;
+  }
+}
+
 describe("LoginUserUseCase", () => {
   let useCase: LoginUserUseCase;
   let userRepository: MockUserRepository;
   let tokenGenerator: MockTokenGenerator;
+  let passwordHasher: MockPasswordHasher;
 
   beforeEach(async () => {
     userRepository = new MockUserRepository();
     tokenGenerator = new MockTokenGenerator();
-    useCase = new LoginUserUseCase(userRepository, tokenGenerator);
+    passwordHasher = new MockPasswordHasher();
+    useCase = new LoginUserUseCase(userRepository, tokenGenerator, passwordHasher);
 
-    // テスト用ユーザー作成
+    // テスト用ユーザー作成（パスワードは IPasswordHasher で事前にハッシュ化してから渡す。
+    // User エンティティ自身はもうハッシュ化・照合を行わない）
+    const hashedPassword = await passwordHasher.hash("ValidPassword123");
     const user = await User.create(
       new Email("john@example.com"),
-      "ValidPassword123",
+      hashedPassword,
       "John Doe"
     );
     await userRepository.save(user);
@@ -690,7 +689,7 @@ describe("UserController", () => {
 
 ```
 □ Email 値オブジェクト - 有効/無効フォーマット
-□ Password 値オブジェクト - 強度チェック、マッチング
+□ Password 値オブジェクト - 強度チェック（validateStrength）、ハッシュ生成（fromHash）
 □ User エンティティ - 生成、ビジネスロジック
 □ エラークラス - 適切にスロー
 ```
