@@ -14,7 +14,7 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📁 ディレクトリ:        10個 ✅
-📄 実装ファイル:        49個 ✅
+📄 実装ファイル:        46個 ✅
 📝 総コンテンツ行数:    各セクションの概算行数の合計で約20,000〜25,000行（概数） ✅
 💻 コード例:            100+ ✅
 ```
@@ -59,18 +59,34 @@
   - 04-implementation-example.md
   - 05-testing-strategy.md
 
-- ✅ **06-best-practices/** (1ファイル)
+- ✅ **06-best-practices/** (6ファイル)
   - README.md - 命名規則、エラー処理、ロギング、パフォーマンス、セキュリティ
+  - 01-naming-conventions.md - 命名規則
+  - 02-error-handling.md - エラー処理
+  - 03-logging-monitoring.md - ロギング・モニタリング
+  - 04-performance-optimization.md - パフォーマンス最適化
+  - 05-security.md - セキュリティ
 
 ### Part 3: 実践知識
-- ✅ **07-common-pitfalls/** (1ファイル)
+- ✅ **07-common-pitfalls/** (5ファイル)
   - README.md - 4つのアンチパターン解説
+  - 01-over-engineering.md - オーバーエンジニアリング
+  - 02-tight-coupling.md - 密結合
+  - 03-anemic-model.md - 貧血ドメインモデル
+  - 04-circular-dependency.md - 循環依存
 
-- ✅ **08-case-studies/** (1ファイル)
+- ✅ **08-case-studies/** (4ファイル)
   - README.md - 3つのケーススタディ（EC、SNS、マイクロサービス）
+  - 01-ecommerce-site.md - ECサイト
+  - 02-sns-platform.md - SNSプラットフォーム
+  - 03-microservices.md - マイクロサービス
 
-- ✅ **09-tools-and-resources/** (1ファイル)
+- ✅ **09-tools-and-resources/** (5ファイル)
   - README.md - ツール、フレームワーク、学習リソース
+  - 01-frameworks.md - フレームワーク
+  - 02-di-containers.md - DIコンテナ
+  - 03-development-tools.md - 開発ツール
+  - 04-learning-resources.md - 学習リソース
 
 ### 特別なリソース
 - ✅ **QUICK-REFERENCE.md** - 30秒で理解するクイックリファレンス
@@ -283,6 +299,9 @@
 ```
 📈 セクション別行数:
 
+Part 0: スタート地点
+└─ 00-COVER.md, index.md  2ファイル
+
 Part 1: 基礎理論
 ├─ 01-introduction     3ファイル  ≈ 2,500行
 ├─ 02-core-principles  5ファイル  ≈ 3,500行
@@ -292,21 +311,21 @@ Part 1: 基礎理論
 Part 2: 実装パターン
 ├─ 04-design-patterns  5ファイル  ≈ 2,500行
 ├─ 05-implementation   6ファイル  ≈ 3,000行
-└─ 06-best-practices   1ファイル  ≈ 1,500行
-    小計: 12ファイル, 7,000行
+└─ 06-best-practices   6ファイル  ≈ 1,500行
+    小計: 17ファイル, 7,000行
 
 Part 3: 実践知識
-├─ 07-common-pitfalls  1ファイル  ≈ 2,000行
-├─ 08-case-studies     1ファイル  ≈ 2,500行
-└─ 09-tools-resources  1ファイル  ≈ 2,000行
-    小計: 3ファイル, 6,500行
+├─ 07-common-pitfalls  5ファイル  ≈ 2,000行
+├─ 08-case-studies     4ファイル  ≈ 2,500行
+└─ 09-tools-resources  5ファイル  ≈ 2,000行
+    小計: 14ファイル, 6,500行
 
 特別リソース
 ├─ QUICK-REFERENCE.md
 └─ README.md
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-合計: 49ファイル, 各セクションの概算行数の合計（約20,000〜25,000行、概数）
+合計: 46ファイル, 各セクションの概算行数の合計（約20,000〜25,000行、概数）
 ```
 
 ---
