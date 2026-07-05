@@ -1,6 +1,6 @@
 # 02. リポジトリパターン (Repository Pattern)
 
-> **パターン**: データベーク操作をカプセル化。ドメイン層がDB方言を知らない。
+> **パターン**: データベース操作をカプセル化。ドメイン層がDB方言を知らない。
 
 ## 🎯 コンセプト
 
@@ -86,6 +86,44 @@ export class GetUserUseCase {
 ✅ テスト時にモック可能
 ✅ DB変更が容易（MySQLからPostgreSQLへ）
 ✅ 複数DB対応が簡単
+```
+
+---
+
+## 🧪 テスト
+
+```typescript
+describe('GetUserUseCase', () => {
+  test('should return user from repository', async () => {
+    const mockRepository: UserRepository = {
+      save: jest.fn(),
+      getById: jest.fn().mockResolvedValue(new User('1', 'test@example.com', 'John')),
+      getByEmail: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn()
+    };
+
+    const useCase = new GetUserUseCase(mockRepository);
+    const user = await useCase.execute('1');
+
+    expect(mockRepository.getById).toHaveBeenCalledWith('1');
+    expect(user).toBeDefined();
+  });
+
+  test('should throw when user not found', async () => {
+    const mockRepository: UserRepository = {
+      save: jest.fn(),
+      getById: jest.fn().mockResolvedValue(null),
+      getByEmail: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn()
+    };
+
+    const useCase = new GetUserUseCase(mockRepository);
+
+    await expect(useCase.execute('unknown')).rejects.toThrow(UserNotFoundError);
+  });
+});
 ```
 
 ---

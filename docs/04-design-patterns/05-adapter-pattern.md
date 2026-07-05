@@ -12,6 +12,8 @@
 外部ライブラリBのインターフェース
 ```
 
+> **注意（別概念）**: ここでの「アダプタパターン」は GoF（Gang of Four）のデザインパターンの1つで、あるインターフェースを別のインターフェースに変換する構造的パターンである。名前が似ているが、クリーンアーキテクチャの **Interface Adapters 層**（Controller・Presenter・View が属し、内部フォーマットと外部フォーマットを変換する層。[01-overview.md](../01-introduction/01-overview.md) 参照）とは別の概念なので混同しないこと。本パターンの実装クラス（各種アダプタ）は、この教材の4層モデルでは主にインフラストラクチャ層に置かれる。
+
 ---
 
 ## 💻 実装例1：メールサービスの統一
@@ -80,7 +82,7 @@ export class NotificationUseCase {
   constructor(private emailService: EmailService) {}
 
   async notifyUser(email: string, message: string): Promise<void> {
-    // SendGrid든 AWS든 関係なく使用できる
+    // SendGridでもAWSでも関係なく使用できる
     await this.emailService.send(
       email,
       'Notification',
