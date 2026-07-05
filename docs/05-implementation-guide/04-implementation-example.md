@@ -120,7 +120,6 @@ export class Email {
 ### domain/value-objects/Password.ts
 
 ```typescript
-import * as bcrypt from "bcrypt";
 import { InvalidPasswordError } from "../errors/DomainError";
 
 export class Password {
@@ -133,25 +132,21 @@ export class Password {
     this.hashedValue = hashedValue;
   }
 
-  static async fromPlainText(plainPassword: string): Promise<Password> {
-    this.validateStrength(plainPassword);
-    const hashedValue = await bcrypt.hash(plainPassword, 10);
-    return new Password(hashedValue);
-  }
-
+  // ハッシュ化済み文字列から生成。ハッシュ化そのもの（bcrypt 等）は
+  // IPasswordHasher の実装（Infrastructure 層の BcryptHasher）が行う。
+  // Password は特定のハッシュアルゴリズムに依存しない
+  // （Dependency Rule: Domain 層は外部ライブラリに依存しない）
   static fromHash(hash: string): Password {
     return new Password(hash);
-  }
-
-  async matches(plainPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainPassword, this.hashedValue);
   }
 
   getHashedValue(): string {
     return this.hashedValue;
   }
 
-  private static validateStrength(password: string): void {
+  // ビジネスルール: パスワード強度チェック（平文に対する純粋な検証）
+  // ハッシュ化前に UseCase 層が呼び出す
+  static validateStrength(password: string): void {
     const errors: string[] = [];
 
     if (password.length < 8) {
@@ -209,16 +204,19 @@ export class User {
     this.isActive = isActive;
   }
 
+  // 注意: plainPassword の強度チェック・ハッシュ化は Application 層（UseCase）の責務。
+  // UseCase が Password.validateStrength() と IPasswordHasher.hash() を実行した後、
+  // 生成済みのハッシュ文字列を hashedPassword として渡す
   static async create(
     email: Email,
-    plainPassword: string,
+    hashedPassword: string,
     name: string
   ): Promise<User> {
     if (name.length < 2 || name.length > 100) {
       throw new Error("Name must be 2-100 characters");
     }
 
-    const password = await Password.fromPlainText(plainPassword);
+    const password = Password.fromHash(hashedPassword);
     return new User(uuid(), email, password, name, new Date(), new Date(), true);
   }
 
@@ -233,10 +231,6 @@ export class User {
   ): User {
     const password = Password.fromHash(hashedPassword);
     return new User(id, email, password, name, createdAt, updatedAt, isActive);
-  }
-
-  async isPasswordMatches(plainPassword: string): Promise<boolean> {
-    return this.password.matches(plainPassword);
   }
 
   getId(): string {
@@ -355,7 +349,9 @@ export interface ITokenGenerator {
 ```typescript
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { IEmailSendingService } from "../interfaces/IEmailSendingService";
+import { IPasswordHasher } from "../interfaces/IPasswordHasher";
 import { Email } from "../../domain/value-objects/Email";
+import { Password } from "../../domain/value-objects/Password";
 import { User } from "../../domain/entities/User";
 import {
   UserAlreadyExistsError,
@@ -369,7 +365,8 @@ import {
 export class RegisterUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private emailSendingService: IEmailSendingService
+    private emailSendingService: IEmailSendingService,
+    private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<RegisterUserResponse> {
@@ -385,13 +382,18 @@ export class RegisterUserUseCase {
         );
       }
 
-      // 3. User エンティティ生成
-      const user = await User.create(email, request.password, request.name);
+      // 3. パスワード強度チェック（ドメインルール）とハッシュ化
+      //    bcrypt 等の実装詳細は IPasswordHasher 経由で Infrastructure 層に隔離する
+      Password.validateStrength(request.password);
+      const hashedPassword = await this.passwordHasher.hash(request.password);
 
-      // 4. リポジトリで保存
+      // 4. User エンティティ生成
+      const user = await User.create(email, hashedPassword, request.name);
+
+      // 5. リポジトリで保存
       await this.userRepository.save(user);
 
-      // 5. メール送信（非同期で、失敗してもユースケースは成功）
+      // 6. メール送信（非同期で、失敗してもユースケースは成功）
       this.emailSendingService
         .send(
           request.email,
@@ -402,7 +404,7 @@ export class RegisterUserUseCase {
           console.warn(`Failed to send welcome email: ${err.message}`);
         });
 
-      // 6. レスポンス
+      // 7. レスポンス
       return new RegisterUserResponse(user.getId());
     } catch (error) {
       throw error;
@@ -416,6 +418,7 @@ export class RegisterUserUseCase {
 ```typescript
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { ITokenGenerator } from "../interfaces/ITokenGenerator";
+import { IPasswordHasher } from "../interfaces/IPasswordHasher";
 import { Email } from "../../domain/value-objects/Email";
 import { InvalidCredentialsError } from "../errors/ApplicationError";
 import {
@@ -426,7 +429,8 @@ import {
 export class LoginUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private tokenGenerator: ITokenGenerator
+    private tokenGenerator: ITokenGenerator,
+    private passwordHasher: IPasswordHasher
   ) {}
 
   async execute(request: LoginUserRequest): Promise<LoginUserResponse> {
@@ -438,8 +442,12 @@ export class LoginUserUseCase {
       throw new InvalidCredentialsError("Invalid email or password");
     }
 
-    // 2. パスワード検証
-    const passwordMatches = await user.isPasswordMatches(request.password);
+    // 2. パスワード検証（IPasswordHasher 経由。bcrypt 等の実装詳細は
+    //    Infrastructure 層に隔離し、Domain/Application 層はこれに依存しない）
+    const passwordMatches = await this.passwordHasher.compare(
+      request.password,
+      user.getHashedPassword()
+    );
     if (!passwordMatches) {
       throw new InvalidCredentialsError("Invalid email or password");
     }

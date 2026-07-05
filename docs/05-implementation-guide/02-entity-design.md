@@ -186,35 +186,23 @@ export class Password {
     this.hashedValue = hashedValue;
   }
 
-  // 静的ファクトリメソッド1: 平文から作成
-  static async fromPlainText(plainPassword: string): Promise<Password> {
-    // 1. 強度チェック
-    this.validateStrength(plainPassword);
-
-    // 2. ハッシュ化（bcrypt）
-    const hashedValue = await bcrypt.hash(plainPassword, 10);
-
-    // 3. Password インスタンス生成
-    return new Password(hashedValue);
-  }
-
-  // 静的ファクトリメソッド2: ハッシュ化済みから生成（DB読み込み）
+  // 静的ファクトリメソッド: ハッシュ化済み文字列から生成
+  // 注意: ハッシュ化そのもの（bcrypt 等）は IPasswordHasher の実装
+  // （Infrastructure 層の BcryptHasher）が行う。Password は「ハッシュ済みの値」を
+  // 保証するだけで、具体的なハッシュアルゴリズムには依存しない
+  // （Dependency Rule: Domain 層は外部ライブラリに依存しない）
   static fromHash(hash: string): Password {
     return new Password(hash);
   }
 
-  // ビジネスロジック: パスワード検証
-  async matches(plainPassword: string): Promise<boolean> {
-    return bcrypt.compare(plainPassword, this.hashedValue);
-  }
-
-  // ハッシュ値取得（DB保存用）
+  // ハッシュ値取得（DB保存用、IPasswordHasher.compare() に渡す用）
   getHashedValue(): string {
     return this.hashedValue;
   }
 
-  // ビジネスルール: パスワード強度チェック
-  private static validateStrength(password: string): void {
+  // ビジネスルール: パスワード強度チェック（平文に対する純粋な検証ロジック）
+  // ハッシュ化前に、呼び出し側（UseCase）が実行する
+  static validateStrength(password: string): void {
     const errors: string[] = [];
 
     if (password.length < 8) {
@@ -236,12 +224,16 @@ export class Password {
   }
 }
 
-// 使用例
-// 新規登録時
-const password1 = await Password.fromPlainText("MyPassword123");
+// 使用例（実際のハッシュ化・照合は UseCase が IPasswordHasher 経由で行う。
+// 詳細は 03-usecase-design.md を参照）
+//
+// 新規登録時（UseCase 内）
+// Password.validateStrength(plainPassword);                       // 1. 強度チェック（ドメインルール）
+// const hashedValue = await passwordHasher.hash(plainPassword);   // 2. ハッシュ化（IPasswordHasher）
+// const password1 = Password.fromHash(hashedValue);               // 3. 値オブジェクト生成
 
-// ログイン検証時
-const matches = await password1.matches("MyPassword123");  // true
+// ログイン検証時（UseCase 内）
+// const matches = await passwordHasher.compare(plainPassword, user.getHashedPassword());
 
 // DB から読み込み
 const hashFromDb = "$2b$10$...";
@@ -249,7 +241,7 @@ const password2 = Password.fromHash(hashFromDb);
 
 // 弱いパスワード
 try {
-  await Password.fromPlainText("weak");  // エラー
+  Password.validateStrength("weak");  // エラー
 } catch (error) {
   console.log(error.message);
 }
@@ -291,9 +283,12 @@ export class User {
   }
 
   // ファクトリメソッド1: 新規ユーザー作成
+  // 注意: plainPassword の強度チェック・ハッシュ化は Application 層（UseCase）の責務。
+  // UseCase が Password.validateStrength() と IPasswordHasher.hash() を実行した後、
+  // 生成済みのハッシュ文字列を hashedPassword として渡す（詳細は 03-usecase-design.md を参照）
   static async create(
     email: Email,
-    plainPassword: string,
+    hashedPassword: string,
     name: string
   ): Promise<User> {
     // ビジネスロジック: ユーザー名の長さチェック
@@ -301,8 +296,8 @@ export class User {
       throw new InvalidNameError("Name must be 2-100 characters");
     }
 
-    // パスワード生成（強度チェック含む）
-    const password = await Password.fromPlainText(plainPassword);
+    // ハッシュ済みパスワードを値オブジェクトでラップ
+    const password = Password.fromHash(hashedPassword);
 
     return new User(
       uuid(),
@@ -331,12 +326,7 @@ export class User {
 
   // ビジネスロジック: ビジネスルール
 
-  // 1. パスワード検証ロジック
-  async isPasswordMatches(plainPassword: string): Promise<boolean> {
-    return this.password.matches(plainPassword);
-  }
-
-  // 2. プロフィール更新ロジック
+  // 1. プロフィール更新ロジック
   updateProfile(newName: string, newEmail: Email): void {
     // バリデーション
     if (newName.length < 2 || newName.length > 100) {
@@ -356,15 +346,16 @@ export class User {
     }
   }
 
-  // 3. パスワード変更ロジック
-  async changePassword(newPlainPassword: string): Promise<void> {
-    // 新しいパスワード生成（強度チェック含む）
-    const newPassword = await Password.fromPlainText(newPlainPassword);
-    this.password = newPassword;
+  // 2. パスワード変更ロジック
+  // 注意: 強度チェック・ハッシュ化は Application 層（UseCase）が
+  // Password.validateStrength() と IPasswordHasher.hash() で行い、
+  // 生成済みのハッシュ文字列を newHashedPassword として渡す
+  changePassword(newHashedPassword: string): void {
+    this.password = Password.fromHash(newHashedPassword);
     this.updatedAt = new Date();
   }
 
-  // 4. アカウント無効化
+  // 3. アカウント無効化
   deactivate(): void {
     if (!this.isActive) {
       throw new UserAlreadyDeactivatedError();
@@ -373,7 +364,7 @@ export class User {
     this.updatedAt = new Date();
   }
 
-  // 5. アカウント有効化
+  // 4. アカウント有効化
   activate(): void {
     if (this.isActive) {
       throw new UserAlreadyActiveError();
@@ -394,6 +385,12 @@ export class User {
 
   getPassword(): Password {
     return this.password;
+  }
+
+  // ハッシュ化済みパスワード取得（DB保存用、および Application 層で
+  // IPasswordHasher.compare() に渡す用。パスワード照合自体はここでは行わない）
+  getHashedPassword(): string {
+    return this.password.getHashedValue();
   }
 
   getName(): string {
@@ -421,7 +418,7 @@ export class User {
 | 値オブジェクト | 持つビジネスルール | 例 |
 |-------------|-------------|-----|
 | `Email` | メール形式チェック、ドメイン抽出 | `user@example.com` |
-| `Password` | 強度チェック、ハッシュ化、マッチング | 8文字以上、大文字含む |
+| `Password` | 強度チェック（ハッシュ化・照合は `IPasswordHasher` が担当） | 8文字以上、大文字含む |
 | `Money` | 通貨単位の統一、計算 | 100 JPY + 50 JPY = 150 JPY |
 | `Range` | 日付範囲の妥当性チェック | 開始日 < 終了日 |
 | `UserId` | ID形式チェック | UUID形式 |
@@ -460,23 +457,27 @@ export class User {
 async function exampleUserFlow() {
   try {
     // 1. 新規ユーザー作成
+    // 実務では、強度チェック（Password.validateStrength）とハッシュ化（IPasswordHasher.hash）は
+    // Application 層（UseCase）が行い、ハッシュ済み文字列を User.create() に渡す
     const email = new Email("john@example.com");
-    const user = await User.create(email, "MyPassword123", "John Doe");
+    Password.validateStrength("MyPassword123");
+    const hashedPassword = "$2b$10$..."; // 実際は passwordHasher.hash() の戻り値
+    const user = await User.create(email, hashedPassword, "John Doe");
 
     console.log(`User created: ${user.getName()}`);
     console.log(`Created at: ${user.getCreatedAt()}`);
 
-    // 2. パスワード検証
-    const isCorrect = await user.isPasswordMatches("MyPassword123");
-    console.log(`Password correct: ${isCorrect}`);
+    // 2. パスワード検証（実務では UseCase 内で IPasswordHasher.compare() を使用）
+    // const isCorrect = await passwordHasher.compare("MyPassword123", user.getHashedPassword());
 
     // 3. プロフィール更新
     const newEmail = new Email("john.doe@example.com");
     user.updateProfile("John Doe Jr", newEmail);
     console.log(`Updated profile`);
 
-    // 4. パスワード変更
-    await user.changePassword("NewPassword456");
+    // 4. パスワード変更（ハッシュ化済み文字列を渡す）
+    const newHashedPassword = "$2b$10$..."; // 実際は passwordHasher.hash() の戻り値
+    user.changePassword(newHashedPassword);
     console.log(`Password changed`);
 
     // 5. アカウント無効化
