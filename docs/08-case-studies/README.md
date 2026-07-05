@@ -214,7 +214,7 @@ export class MySQLOrderRepository implements OrderRepository {
     }
 
     // 結果を集約ルートに再構築
-    return this.reconstuctOrder(result);
+    return this.reconstructOrder(result);
   }
 }
 ```

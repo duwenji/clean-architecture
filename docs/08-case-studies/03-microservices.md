@@ -6,7 +6,7 @@
 
 ## 🎯 背景
 
-ユーザー管理、注文処理、決済、在庫管理が のを独立したサービスとして運用される大規模ECプラットフォーム。
+ユーザー管理、注文処理、決済、在庫管理が、それぞれ独立したサービスとして運用される大規模ECプラットフォーム。
 
 **サービス一覧：**
 - User Service：ユーザー認証・プロフィール
@@ -326,7 +326,8 @@ export class InventoryReservedEventHandler {
   constructor(
     private paymentService: PaymentGateway,
     private paymentRepository: PaymentRepository,
-    private eventPublisher: EventPublisher
+    private eventPublisher: EventPublisher,
+    private orderServiceClient: OrderServiceClient
   ) {}
 
   @OnEvent('inventory.reserved')
@@ -382,47 +383,53 @@ export class CreateOrderSaga {
   orderCreated = (events$: Observable<IEvent>) => {
     return events$.pipe(
       ofType(OrderCreatedEvent),
-      
-      // Step 1: 在庫予約
+
+      // event を各ステップのクロージャで参照できるよう、
+      // 以降のステップは mergeMap の内側にネストする
       mergeMap((event: OrderCreatedEvent) =>
-        of(new ReserveInventoryCommand(event.orderId, event.items)).pipe(
-          mergeMap(cmd => this.commandBus.execute(cmd)),
-          timeout(5000),  // 5秒でタイムアウト
-          catchError(() => of(new CancelOrderCommand(event.orderId)))
+        of(event).pipe(
+          // Step 1: 在庫予約
+          mergeMap(() =>
+            of(new ReserveInventoryCommand(event.orderId, event.items)).pipe(
+              mergeMap(cmd => this.commandBus.execute(cmd)),
+              timeout(5000),  // 5秒でタイムアウト
+              catchError(() => of(new CancelOrderCommand(event.orderId)))
+            )
+          ),
+
+          // Step 2: 決済処理
+          mergeMap((result: any) => {
+            if (result instanceof CancelOrderCommand) {
+              return of(result);  // ロールバック
+            }
+
+            return of(
+              new ProcessPaymentCommand(event.orderId, event.totalAmount)
+            ).pipe(
+              mergeMap(cmd => this.commandBus.execute(cmd)),
+              timeout(5000),
+              catchError(() => of(new CancelOrderCommand(event.orderId)))
+            );
+          }),
+
+          // Step 3: 配送手配
+          mergeMap((result: any) => {
+            if (result instanceof CancelOrderCommand) {
+              return of(result);  // ロールバック
+            }
+
+            return of(
+              new ArrangeShipmentCommand(event.orderId)
+            ).pipe(
+              mergeMap(cmd => this.commandBus.execute(cmd))
+            );
+          }),
+
+          // エラー処理：サガ失敗時のキャンセルフローを発行
+          catchError((error: any) =>
+            of(new CancelOrderCommand(event.orderId))
+          )
         )
-      ),
-
-      // Step 2: 決済処理
-      mergeMap((result: any) => {
-        if (result instanceof CancelOrderCommand) {
-          return of(result);  // ロールバック
-        }
-
-        return of(
-          new ProcessPaymentCommand(event.orderId, event.totalAmount)
-        ).pipe(
-          mergeMap(cmd => this.commandBus.execute(cmd)),
-          timeout(5000),
-          catchError(() => of(new CancelOrderCommand(event.orderId)))
-        );
-      }),
-
-      // Step 3: 配送手配
-      mergeMap((result: any) => {
-        if (result instanceof CancelOrderCommand) {
-          return of(result);  // ロールバック
-        }
-
-        return of(
-          new ArrangeShipmentCommand(event.orderId)
-        ).pipe(
-          mergeMap(cmd => this.commandBus.execute(cmd))
-        );
-      }),
-
-      // エラー処理：サガ失敗時のキャンセルフローを発行
-      catchError((error: any) =>
-        of(new CancelOrderCommand(event.orderId))
       )
     );
   };
