@@ -288,4 +288,4 @@ export class GetUserByIdUseCase {
 
 ---
 
-**次: [密結合の回避 →](./02-tight-coupling.md)**
+**次: [密結合の回避 →](./03-tight-coupling.md)**

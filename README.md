@@ -72,7 +72,7 @@
   - [01. Frameworks](./docs/09-tools-and-resources/01-frameworks.md)
   - [02. DI Containers](./docs/09-tools-and-resources/02-di-containers.md)
   - [03. Development Tools](./docs/09-tools-and-resources/03-development-tools.md)
-  - [04. Learning Resources](./docs/09-tools-and-resources/04-learning-resources.md)
+  - [05. Learning Resources](./docs/09-tools-and-resources/05-learning-resources.md)
 <!-- AUTO-TOC:END -->
 
 ---
