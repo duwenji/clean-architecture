@@ -109,6 +109,7 @@ export class UserController {
   constructor(
     private registerUserUseCase: RegisterUserUseCase,
     private getUserUseCase: GetUserUseCase,
+    private deleteUserUseCase: DeleteUserUseCase,
     private validator: CreateUserRequestValidator,
     private mapper: UserMapper
   ) {}
@@ -327,16 +328,22 @@ export class CLIUserCommand {
 describe('UserController', () => {
   let controller: UserController;
   let mockRegisterUseCase: MockRegisterUserUseCase;
+  let mockGetUseCase: MockGetUserUseCase;
+  let mockDeleteUseCase: MockDeleteUserUseCase;
   let mockValidator: MockValidator;
   let mockMapper: MockMapper;
 
   beforeEach(() => {
     mockRegisterUseCase = new MockRegisterUserUseCase();
+    mockGetUseCase = new MockGetUserUseCase();
+    mockDeleteUseCase = new MockDeleteUserUseCase();
     mockValidator = new MockValidator();
     mockMapper = new MockMapper();
 
     controller = new UserController(
       mockRegisterUseCase,
+      mockGetUseCase,
+      mockDeleteUseCase,
       mockValidator,
       mockMapper
     );

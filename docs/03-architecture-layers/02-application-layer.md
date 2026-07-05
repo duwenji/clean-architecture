@@ -57,7 +57,7 @@ application/
 │   ├── OrderDto.ts
 │   └── ...
 └── port/
-    ├── NotificationService.ts  (インターフェース。※リポジトリのインターフェースはドメイン層が定義する)
+    ├── NotificationPort.ts  (インターフェース。※リポジトリのインターフェースはドメイン層が定義する)
     └── ...
 ```
 
