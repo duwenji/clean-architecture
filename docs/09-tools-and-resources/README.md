@@ -348,7 +348,7 @@ graphql-codegen --config codegen.yml
    内容: Clean Architecture に関する最新考察
 
 📝 DDD Community
-   https://ddd-community.org/
+   https://dddcommunity.org/
    内容: Domain-Driven Design の実装例
 
 📝 Martin Fowler's Blog
