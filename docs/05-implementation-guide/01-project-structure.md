@@ -28,9 +28,12 @@ user-management-system/
 │   │   │   ├── UpdateProfileUseCase.ts
 │   │   │   └── LoginUserUseCase.ts
 │   │   ├── dtos/
-│   │   │   ├── RegisterUserDTO.ts
+│   │   │   ├── RegisterUserRequest.ts
 │   │   │   ├── UserResponseDTO.ts
-│   │   │   └── LoginRequestDTO.ts
+│   │   │   └── LoginUserRequest.ts
+│   │   ├── interfaces/
+│   │   │   ├── IEmailSendingService.ts
+│   │   │   └── IPasswordHasher.ts
 │   │   └── services/
 │   │       └── EmailSendingService.ts
 │   │
@@ -105,7 +108,7 @@ user-management-system/
 
 ```typescript
 // domain/entities/User.ts
-// パぐあいエンティティ
+// User エンティティ
 export class User {
   private id: string;
   private email: Email;       // 値オブジェクト
@@ -178,8 +181,7 @@ export interface IUserRepository {
 export class RegisterUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private emailSendingService: IEmailSendingService,
-    private passwordHasher: IPasswordHasher
+    private emailSendingService: IEmailSendingService
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<void> {
@@ -191,13 +193,11 @@ export class RegisterUserUseCase {
       throw new UserAlreadyExistsError();
     }
 
-    // 2. ドメインオブジェクト生成
-    const password = new Password(request.password);
-    const hashedPassword = await this.passwordHasher.hash(password.getValue());
-    const user = new User(
-      UUID.v4(),
+    // 2. ドメインオブジェクト生成（パスワードの強度チェック・ハッシュ化は
+    //    Password 値オブジェクトが内部で行う。詳細は 02-entity-design.md を参照）
+    const user = await User.create(
       new Email(request.email),
-      hashedPassword,
+      request.password,
       request.name
     );
 
@@ -213,9 +213,9 @@ export class RegisterUserUseCase {
   }
 }
 
-// application/dtos/RegisterUserDTO.ts
+// application/dtos/RegisterUserRequest.ts
 // データ転送オブジェクト（層間のデータ受け渡し）
-export class RegisterUserDTO {
+export class RegisterUserRequest {
   constructor(
     public email: string,
     public password: string,
@@ -252,7 +252,7 @@ export class UserController {
   async register(req: Request, res: Response): Promise<void> {
     try {
       // 1. リクエストボディをDTO変換
-      const dto = new RegisterUserDTO(
+      const dto = new RegisterUserRequest(
         req.body.email,
         req.body.password,
         req.body.name
@@ -393,11 +393,10 @@ export class Container {
   registerRegisterUserUseCase(): void {
     const userRepository = this.instances.get("UserRepository");
     const emailService = this.instances.get("EmailSendingService");
-    const passwordHasher = this.instances.get("PasswordHasher");
 
     this.instances.set(
       "RegisterUserUseCase",
-      new RegisterUserUseCase(userRepository, emailService, passwordHasher)
+      new RegisterUserUseCase(userRepository, emailService)
     );
   }
 

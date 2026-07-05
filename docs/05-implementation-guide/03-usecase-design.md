@@ -130,8 +130,7 @@ export interface IPasswordHasher {
 export class RegisterUserUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private emailSendingService: IEmailSendingService,
-    private passwordHasher: IPasswordHasher
+    private emailSendingService: IEmailSendingService
   ) {}
 
   async execute(request: RegisterUserRequest): Promise<RegisterUserResponse> {
@@ -332,7 +331,7 @@ export class UserController {
       // 2. ユースケース実行
       const response = await this.registerUserUseCase.execute(request);
 
-      // 3. Response를 HTTP レスポンスに変換
+      // 3. Response を HTTP レスポンスに変換
       res.status(201).json({
         message: "User registered successfully",
         userId: response.userId
@@ -401,7 +400,7 @@ export class UserController {
 ```
 Presentation
     ↓
-UseCase ← Interface (IUserRepository / IEmailService)
+UseCase ← Interface (IUserRepository / IEmailSendingService)
     ↓
 Domain (Entity, ValueObject)
 

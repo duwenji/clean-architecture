@@ -2,7 +2,7 @@
 
 このセクションでは、クリーンアーキテクチャを実際のプロジェクトにどう適用するかを学びます。
 
-> 実装例：ユーザー管理システム（CRUD + 認認証）
+> 実装例：ユーザー管理システム（CRUD + 認証）
 
 ## 📖 セクション構成
 
@@ -121,7 +121,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["1️⃣ プロジェクト構造を作成<br/>└─ フォルダ/ファイル配置"] --> B["2️⃣ ドメインエンティティを定義<br/>└─ User, Password, Email等"]
-    B --> C["3️⃣ リポジトリインターフェース定義<br/>└─ UserRepository etc."]
+    B --> C["3️⃣ リポジトリインターフェース定義<br/>└─ IUserRepository等"]
     C --> D["4️⃣ ユースケースを実装<br/>└─ RegisterUser, GetUser等"]
     D --> E["5️⃣ Controller を実装<br/>└─ HTTP エンドポイント"]
     E --> F["6️⃣ リポジトリ実装<br/>└─ MySQL 実装"]
@@ -164,7 +164,7 @@ flowchart TD
 ### [01-project-structure.md](./01-project-structure.md)
 - フォルダ構成図
 - ファイル配置の意図
-- モノレポ vs マイクロサービス対応
+- 各層の役割・責務と依存関係のルール
 
 ### [02-entity-design.md](./02-entity-design.md)
 - User エンティティの完全実装
@@ -178,13 +178,13 @@ flowchart TD
 
 ### [04-implementation-example.md](./04-implementation-example.md)
 - 全層を含む完全例
-- お金を返すコードを見ながら学ぶ
+- ユーザー登録・ログインの一連の流れを追いながら学ぶ
 - 実際に動かせるコード
 
 ### [05-testing-strategy.md](./05-testing-strategy.md)
-- ユニットテスト（各層）
+- ユニットテスト（Domain・Application層）
 - 統合テスト
-- E2E テスト
+- Controller（Presentation層）テスト
 - テストダブル（モック）
 
 ---
