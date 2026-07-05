@@ -275,7 +275,7 @@ Part 3: 実践知識         [████████████████] 
   ✅ QUICK-REFERENCE.md  (クイックリファレンス)
   ✅ COMPLETION-REPORT.md (完成報告書)
 
-📝 合計50ファイル、15,000行以上のコンテンツ
+📝 合計49ファイル、docs/配下全体で約15,000〜20,000行のコンテンツ（概算）
 💻 100+ 実装コード例
 📊 複数のアーキテクチャ図
 🎨 美しい表紙デザイン
@@ -343,7 +343,7 @@ Part 3: 実践知識         [████████████████] 
 **オンラインリソース：**
 - https://blog.cleancoder.com/
 - https://martinfowler.com/
-- https://ddd-community.org/
+- https://dddcommunity.org/
 
 ---
 
