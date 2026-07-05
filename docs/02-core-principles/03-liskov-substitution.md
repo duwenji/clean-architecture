@@ -290,7 +290,7 @@ class MockPaymentMethod implements PaymentMethod {
 // ❌ LSP違反
 class Database {
   query(sql: string): Promise<any> {
-    // SQLスタートメント以上を処理できる
+    // 任意のSQLステートメントを処理できる
   }
 }
 
