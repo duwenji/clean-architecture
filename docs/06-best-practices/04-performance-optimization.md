@@ -276,9 +276,9 @@ EXPLAIN SELECT * FROM users WHERE email = 'john@example.com';
 
 ```typescript
 // database/ConnectionPool.ts
-import { Pool } from 'mysql2/promise';
+import mysql from 'mysql2/promise';
 
-const pool = new Pool({
+const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'password',
@@ -288,11 +288,25 @@ const pool = new Pool({
   queueLimit: 0               // キュー内の最大待機数
 });
 
-// 接続数を監視
+// 接続の取得状況を監視
+// 注意: mysql2 はプールの待機キュー長を公開 API として提供していないため、
+// 取得のたびに自前でカウンターを更新して計測する
+let activeConnections = 0;
+
+async function withConnection<T>(fn: (conn: mysql.PoolConnection) => Promise<T>): Promise<T> {
+  const conn = await pool.getConnection();
+  activeConnections++;
+  try {
+    return await fn(conn);
+  } finally {
+    activeConnections--;
+    conn.release();
+  }
+}
+
 setInterval(() => {
-  const metrics = pool._connectionPromiseQueue;
   logger.info('Connection pool status', {
-    queueLength: metrics.length
+    activeConnections
   });
 }, 60000);
 ```
@@ -303,7 +317,7 @@ setInterval(() => {
 
 ```typescript
 // utils/PerformanceMonitor.ts
-export function measureTime<T>(
+export async function measureTime<T>(
   operation: () => Promise<T>
 ): Promise<{ result: T; duration: number }> {
   const startTime = Date.now();

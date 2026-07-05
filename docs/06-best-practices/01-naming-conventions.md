@@ -104,7 +104,7 @@ private _internalState: number;  // or 使わない
 ❌ 悪い例
 const u = 'John';           // 1文字
 const data = 'John';        // 曖昧
-const temp = 'John';        // 一時的⁈
+const temp = 'John';        // 「一時的」の意味が曖昧
 const x = 5;                // 意図が不明確
 const user_name = 'John';   // スネークケース（TypeScript では非推奨）
 ```
@@ -171,7 +171,7 @@ class InvalidEmailError extends DomainError { }
 class UserAlreadyExistsError extends DomainError { }
 
 // ドメインサービス
-class PasswordHashService { }
+class PasswordPolicyService { }
 class UserVerificationService { }
 ```
 
@@ -230,7 +230,7 @@ class PasswordValidator { }
 ✅ スコープに応じた長さ
 ✅ チーム内で統一
 ✅ Domain/Use Case/Repository など役割が明確
-✅略語を避ける（UserService ✅、UserSvc ❌）
+✅ 略語を避ける（UserService ✅、UserSvc ❌）
 ```
 
 ---

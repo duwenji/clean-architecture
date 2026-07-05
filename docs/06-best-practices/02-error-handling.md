@@ -49,9 +49,10 @@ export abstract class DomainError extends Error {
 
 export class InvalidEmailError extends DomainError {}
 export class InvalidPasswordError extends DomainError {}
-export class UserAlreadyExistsError extends DomainError {}
 export class InsufficientBalanceError extends DomainError {}
 export class InvalidOrderStatusError extends DomainError {}
+// 注意: ユーザーの重複チェックはリポジトリへの問い合わせを伴うため、
+// エンティティ単体では判定できないアプリケーション層の関心事（下記 UserAlreadyExistsApplicationError を参照）
 
 // domain/entities/User.ts
 export class User {
@@ -95,6 +96,18 @@ export class UserAlreadyExistsApplicationError extends ApplicationError {
       'USER_ALREADY_EXISTS',
       409  // Conflict
     );
+  }
+}
+
+export class InvalidEmailApplicationError extends ApplicationError {
+  constructor(message: string) {
+    super(message, 'INVALID_EMAIL', 400);
+  }
+}
+
+export class InvalidPasswordApplicationError extends ApplicationError {
+  constructor(message: string) {
+    super(message, 'INVALID_PASSWORD', 400);
   }
 }
 
@@ -160,14 +173,16 @@ export class UserController {
 
   private handleError(error: any, res: Response): void {
     // ビジネスエラー → 4xx
-    if (error instanceof InvalidEmailError) {
+    // 注意: ドメインエラーはユースケース内でアプリケーションエラーに変換済みのため、
+    // プレゼンテーション層ではアプリケーション層のエラークラスを判定する
+    if (error instanceof InvalidEmailApplicationError) {
       return res.status(400).json({
         error: error.message,
         code: 'INVALID_EMAIL'
       });
     }
 
-    if (error instanceof UserAlreadyExistsError) {
+    if (error instanceof UserAlreadyExistsApplicationError) {
       return res.status(409).json({
         error: error.message,
         code: 'USER_ALREADY_EXISTS'
@@ -204,9 +219,9 @@ export const errorHandler = (
 ) => {
   // アプリケーション層エラーをHTTPに変換
   const errorStatusMap: Record<string, number> = {
-    'InvalidEmailError': 400,
-    'InvalidPasswordError': 400,
-    'UserAlreadyExistsError': 409,
+    'InvalidEmailApplicationError': 400,
+    'InvalidPasswordApplicationError': 400,
+    'UserAlreadyExistsApplicationError': 409,
     'UserNotFoundError': 404,
     'UnauthorizedError': 401,
     'ForbiddenError': 403,

@@ -18,11 +18,13 @@
 
 ## 🎯 各トピックの概要
 
+### 1️⃣ 命名規則
+
 クラス・メソッド・変数の命名ルール。意図が明確で、チーム全体で統一できる規則。
 
 **詳細 → [01-命名規則へ](./01-naming-conventions.md)**
 
-### 02: エラーハンドリング
+### 2️⃣ エラーハンドリング
 
 #### ドメイン層：ビジネスエラー例外
 
@@ -158,7 +160,7 @@ class Email {
 #### Authentication/Authorization
 
 ```typescript
-// MiddleWare
+// Middleware
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   const token = extractToken(req);
   try {

@@ -84,17 +84,23 @@ export class Email {
 }
 
 // domain/value-objects/Password.ts
+// 注意: ハッシュ化そのもの（bcrypt 等）は Domain 層の責務ではない（Dependency Rule:
+// Domain 層は外部ライブラリに依存しない）。ハッシュ化は IPasswordHasher（Infrastructure 層の実装、
+// 例: BcryptHasher）を Application 層の UseCase が呼び出し、Domain にはハッシュ化済みの値だけを渡す
 export class Password {
-  static async fromPlainText(plainPassword: string): Promise<Password> {
-    // 強度チェック
-    this.validateStrength(plainPassword);
+  private readonly hashedValue: string;
 
-    // ハッシュ化
-    const hashedValue = await bcrypt.hash(plainPassword, 12);
+  private constructor(hashedValue: string) {
+    this.hashedValue = hashedValue;
+  }
+
+  // ハッシュ化済み文字列から生成（ハッシュ化自体は IPasswordHasher が担当）
+  static fromHash(hashedValue: string): Password {
     return new Password(hashedValue);
   }
 
-  private static validateStrength(password: string): void {
+  // 強度チェックは外部ライブラリに依存しないドメインルールなので Domain 層が担当
+  static validateStrength(password: string): void {
     const errors: string[] = [];
 
     if (password.length < 8) errors.push('8文字以上');
@@ -107,7 +113,16 @@ export class Password {
       throw new WeakPasswordError(`パスワードは以下を満たしてください: ${errors.join(', ')}`);
     }
   }
+
+  getHashedValue(): string {
+    return this.hashedValue;
+  }
 }
+
+// application/usecases/RegisterUserUseCase.ts（抜粋）
+// Password.validateStrength(plainPassword);                     // 1. 強度チェック（Domain ルール）
+// const hashedValue = await passwordHasher.hash(plainPassword);  // 2. ハッシュ化（IPasswordHasher 経由、Infrastructure 層）
+// const password = Password.fromHash(hashedValue);               // 3. 値オブジェクト生成
 ```
 
 ### インフラ層：DB スキーマ制約
@@ -135,6 +150,8 @@ CREATE TABLE users (
 import * as jwt from 'jsonwebtoken';
 
 export class JwtTokenGenerator implements ITokenGenerator {
+  // 注意: フォールバック値はローカル開発専用。本番環境では JWT_SECRET 未設定時に
+  // 起動を失敗させるべきで、デフォルト値をハードコードしてはならない
   private readonly secret = process.env.JWT_SECRET || 'your-secret-key';
   private readonly expiresIn = '24h';
 
@@ -236,6 +253,8 @@ await db.query(query, { email });
 ## 🔒 パスワード・機密情報
 
 ### bcrypt でハッシュ化
+
+（このロジックは Infrastructure 層の `IPasswordHasher` 実装内に置く。Domain/Application 層は bcrypt に直接依存しない）
 
 ```typescript
 // ❌ 悪い例
