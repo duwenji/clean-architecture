@@ -50,7 +50,8 @@ try {
   if (error instanceof InvalidEmailError) {
     throw new InvalidEmailApplicationError(error.message);
   }
-  throw error; // その他はそのままスロー（プレゼンテーション層でHTTP応答に変換）
+  // その他はそのままスロー（プレゼンテーション層でHTTP応答に変換）
+  throw error;
 }
 ```
 

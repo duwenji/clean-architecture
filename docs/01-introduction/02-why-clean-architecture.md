@@ -151,7 +151,9 @@ describe('UserController.register', () => {
 
 ```mermaid
 flowchart TD
-    A["「DBをMySQLからPostgreSQLに変える」という要件"] --> B["プレゼンテーション層のコードを修正する必要がある"]
+    A["「DBをMySQLからPostgreSQLに変える」という要件"]
+    B["プレゼンテーション層のコードを修正する必要がある"]
+    A --> B
     B --> C["ドメイン層のコードも修正する必要がある"]
     C --> D["アプリケーション層のコードも修正する必要がある"]
     D --> E["全体で50ファイル以上修正"]
@@ -166,7 +168,9 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["「ユーザー登録の条件を変更する」という要件"] --> B["コントローラーに散在したバリデーションを探す"]
+    A["「ユーザー登録の条件を変更する」という要件"]
+    B["コントローラーに散在したバリデーションを探す"]
+    A --> B
     B --> C["DBログに仕込まれたロジックを確認"]
     C --> D["メールサービス側でも条件チェックがある"]
     D --> E["全体で15ファイルを修正"]
@@ -253,7 +257,8 @@ describe('CreateUserUseCase', () => {
 ```mermaid
 flowchart TD
     A["「DBをMySQLからPostgreSQLに変える」"] --> B["クリーンアーキテクチャ:"]
-    B --> C["インフラストラクチャ層の1つのファイル（MySQLUserRepository.ts）を修正"]
+    C["インフラストラクチャ層の1つのファイル（MySQLUserRepository.ts）を修正"]
+    B --> C
     C --> D["それだけ"]
 ```
 

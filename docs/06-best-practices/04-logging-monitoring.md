@@ -198,7 +198,8 @@ export class EmailAdapter implements IEmailSendingService {
 import winston from 'winston';
 
 const logger = winston.createLogger({
-  // Winston の標準 npm levels には fatal が存在しないため、上記の表に合わせて独自定義する
+  // Winston の標準 npm levels には fatal が存在しないため、
+  // 上記の表に合わせて独自定義する
   levels: { fatal: 0, error: 1, warn: 2, info: 3, debug: 4 },
   level: process.env.LOG_LEVEL || 'info',
   format: winston.format.combine(

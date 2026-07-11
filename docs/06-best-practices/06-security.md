@@ -8,7 +8,8 @@
 
 ```mermaid
 flowchart TD
-    A["深層防御：複数層でチェック"] --> B["最小権限：必要最小限のアクセス"]
+    A["深層防御：複数層でチェック"]
+    A --> B["最小権限：必要最小限のアクセス"]
     B --> C["可視化：監視・ログで検出"]
 ```
 
@@ -84,9 +85,13 @@ export class Email {
 }
 
 // domain/value-objects/Password.ts
-// 注意: ハッシュ化そのもの（bcrypt 等）は Domain 層の責務ではない（Dependency Rule:
-// Domain 層は外部ライブラリに依存しない）。ハッシュ化は IPasswordHasher（Infrastructure 層の実装、
-// 例: BcryptHasher）を Application 層の UseCase が呼び出し、Domain にはハッシュ化済みの値だけを渡す
+// 注意: ハッシュ化そのもの（bcrypt 等）は
+// Domain 層の責務ではない
+// （Dependency Rule: Domain 層は外部ライブラリに依存しない）。
+// ハッシュ化は IPasswordHasher
+// （Infrastructure 層の実装、例: BcryptHasher）を
+// Application 層の UseCase が呼び出し、
+// Domain にはハッシュ化済みの値だけを渡す
 export class Password {
   private readonly hashedValue: string;
 
@@ -94,12 +99,14 @@ export class Password {
     this.hashedValue = hashedValue;
   }
 
-  // ハッシュ化済み文字列から生成（ハッシュ化自体は IPasswordHasher が担当）
+  // ハッシュ化済み文字列から生成
+  // （ハッシュ化自体は IPasswordHasher が担当）
   static fromHash(hashedValue: string): Password {
     return new Password(hashedValue);
   }
 
-  // 強度チェックは外部ライブラリに依存しないドメインルールなので Domain 層が担当
+  // 強度チェックは外部ライブラリに依存しない
+  // ドメインルールなので Domain 層が担当
   static validateStrength(password: string): void {
     const errors: string[] = [];
 
@@ -110,7 +117,9 @@ export class Password {
     if (!/[!@#$%^&*]/.test(password)) errors.push('特殊文字を含む');
 
     if (errors.length > 0) {
-      throw new WeakPasswordError(`パスワードは以下を満たしてください: ${errors.join(', ')}`);
+      throw new WeakPasswordError(
+        `パスワードは以下を満たしてください: ${errors.join(', ')}`
+      );
     }
   }
 
@@ -120,9 +129,12 @@ export class Password {
 }
 
 // application/usecases/RegisterUserUseCase.ts（抜粋）
-// Password.validateStrength(plainPassword);                     // 1. 強度チェック（Domain ルール）
-// const hashedValue = await passwordHasher.hash(plainPassword);  // 2. ハッシュ化（IPasswordHasher 経由、Infrastructure 層）
-// const password = Password.fromHash(hashedValue);               // 3. 値オブジェクト生成
+// 1. 強度チェック（Domain ルール）
+// Password.validateStrength(plainPassword);
+// 2. ハッシュ化（IPasswordHasher 経由、Infrastructure 層）
+// const hashedValue = await passwordHasher.hash(plainPassword);
+// 3. 値オブジェクト生成
+// const password = Password.fromHash(hashedValue);
 ```
 
 ### インフラ層：DB スキーマ制約
@@ -150,8 +162,9 @@ CREATE TABLE users (
 import * as jwt from 'jsonwebtoken';
 
 export class JwtTokenGenerator implements ITokenGenerator {
-  // 注意: フォールバック値はローカル開発専用。本番環境では JWT_SECRET 未設定時に
-  // 起動を失敗させるべきで、デフォルト値をハードコードしてはならない
+  // 注意: フォールバック値はローカル開発専用。
+  // 本番環境では JWT_SECRET 未設定時に起動を失敗させるべきで、
+  // デフォルト値をハードコードしてはならない
   private readonly secret = process.env.JWT_SECRET || 'your-secret-key';
   private readonly expiresIn = '24h';
 

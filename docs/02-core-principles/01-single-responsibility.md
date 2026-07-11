@@ -257,8 +257,9 @@ flowchart TD
         B0 --> B7["その他多数..."]
     end
 
-    subgraph After["適用後：各クラスが1つの責任（各クラス40-100行、変更理由が1つ）"]
+    subgraph After["適用後（各クラスが1つの責任）"]
         direction TB
+        ANote["各クラス40-100行<br/>変更理由が1つ"]
         A1["User<br/>(ユーザー情報、バリデーション)"]
         A2["PasswordService<br/>(パスワード処理)"]
         A3["EmailService<br/>(メール送信)"]

@@ -204,8 +204,10 @@ export class User {
     this.isActive = isActive;
   }
 
-  // 注意: plainPassword の強度チェック・ハッシュ化は Application 層（UseCase）の責務。
-  // UseCase が Password.validateStrength() と IPasswordHasher.hash() を実行した後、
+  // 注意: plainPassword の強度チェック・ハッシュ化は
+  // Application 層（UseCase）の責務。
+  // UseCase が Password.validateStrength() と
+  // IPasswordHasher.hash() を実行した後、
   // 生成済みのハッシュ文字列を hashedPassword として渡す
   static async create(
     email: Email,
@@ -621,7 +623,8 @@ export class UserRepository implements IUserRepository {
       `INSERT INTO users (id, email, password_hash, name, created_at, updated_at, is_active)
        VALUES (?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
-       email = VALUES(email), password_hash = VALUES(password_hash), name = VALUES(name), updated_at = VALUES(updated_at)`,
+       email = VALUES(email), password_hash = VALUES(password_hash),
+       name = VALUES(name), updated_at = VALUES(updated_at)`,
       [
         user.getId(),
         user.getEmail().getValue(),

@@ -263,7 +263,9 @@ export class CreateOrderUseCase {
     return user;
   }
 
-  private async validateProducts(items: { productId: string; quantity: number }[]): Promise<Product[]> {
+  private async validateProducts(
+    items: { productId: string; quantity: number }[]
+  ): Promise<Product[]> {
     const productIds = items.map(i => i.productId);
     const products = await this.productRepository.getByIds(productIds);
 

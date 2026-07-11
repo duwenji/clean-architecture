@@ -289,7 +289,8 @@ const pool = mysql.createPool({
 });
 
 // 接続の取得状況を監視
-// 注意: mysql2 はプールの待機キュー長を公開 API として提供していないため、
+// 注意: mysql2 はプールの待機キュー長を
+// 公開 API として提供していないため、
 // 取得のたびに自前でカウンターを更新して計測する
 let activeConnections = 0;
 

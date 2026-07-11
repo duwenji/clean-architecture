@@ -186,7 +186,13 @@ export class MySQLOrderRepository implements OrderRepository {
       // payments テーブル
       await this.connection.query(
         'INSERT INTO payments (id, order_id, method, amount, status) VALUES (?, ?, ?, ?, ?)',
-        [order.payment.id, order.id, order.payment.method, order.getTotalPrice().value, order.payment.status]
+        [
+          order.payment.id,
+          order.id,
+          order.payment.method,
+          order.getTotalPrice().value,
+          order.payment.status,
+        ]
       );
 
       await this.connection.query('COMMIT');

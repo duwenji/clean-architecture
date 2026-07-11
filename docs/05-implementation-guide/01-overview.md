@@ -20,7 +20,9 @@
 
 ```mermaid
 flowchart LR
-    A["前セクション<br/>「なぜ？」「どう動く？」"] -->|理論を学んだ → 実装できる| B["このセクション<br/>「どう作る？」"]
+    A["前セクション<br/>「なぜ？」「どう動く？」"]
+    B["このセクション<br/>「どう作る？」"]
+    A -->|理論を学んだ → 実装できる| B
 ```
 
 ---
@@ -120,7 +122,9 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["1️⃣ プロジェクト構造を作成<br/>└─ フォルダ/ファイル配置"] --> B["2️⃣ ドメインエンティティを定義<br/>└─ User, Password, Email等"]
+    A["1️⃣ プロジェクト構造を作成<br/>└─ フォルダ/ファイル配置"]
+    B["2️⃣ ドメインエンティティを定義<br/>└─ User, Password, Email等"]
+    A --> B
     B --> C["3️⃣ リポジトリインターフェース定義<br/>└─ IUserRepository等"]
     C --> D["4️⃣ ユースケースを実装<br/>└─ RegisterUser, GetUser等"]
     D --> E["5️⃣ Controller を実装<br/>└─ HTTP エンドポイント"]

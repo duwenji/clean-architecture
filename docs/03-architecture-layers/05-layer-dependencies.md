@@ -443,7 +443,8 @@ describe('ProcessPaymentUseCase - Dependency Layers', () => {
 ## 📋 層の依存関係チェックリスト
 
 ```
-✅ 「What（業務ルール）」と「How（実現方法）」が同じファイルに混在していない
+✅ 「What（業務ルール）」と「How（実現方法）」が
+   同じファイルに混在していない
 ✅ 各層の責務が1つの問い（何を/どんな手順で/どうやって）で説明できる
 ✅ ドメイン層がフレームワークをインポートしていない
 ✅ ドメイン層が外部ライブラリをインポートしていない
@@ -467,7 +468,9 @@ describe('ProcessPaymentUseCase - Dependency Layers', () => {
 
 ```mermaid
 flowchart BT
-    Others["他の全層"] -->|インターフェース経由| Domain["ドメイン層<br/>(何も依存しない・最も重要)"]
+    Others["他の全層"]
+    Domain["ドメイン層<br/>(何も依存しない・最も重要)"]
+    Others -->|インターフェース経由| Domain
 ```
 
 ---

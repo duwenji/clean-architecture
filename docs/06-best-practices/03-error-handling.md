@@ -8,7 +8,8 @@
 
 ```mermaid
 flowchart TD
-    A["予測可能：何が起きるか分かる"] --> B["回復可能：対応方法が存在する"]
+    A["予測可能：何が起きるか分かる"]
+    A --> B["回復可能：対応方法が存在する"]
     B --> C["可視化：ログ・監視に記録"]
 ```
 
@@ -22,9 +23,10 @@ flowchart TD
     A --> A2["ユースケース側で処理"]
     A --> A3["例: InvalidEmailError, InsufficientBalanceError"]
 
-    B["アプリケーション層エラー<br/>（ロジックエラー）"] --> B1["ユースケース実行の問題"]
+    B["アプリケーション層エラー<br/>（ロジックエラー）"]
+    B --> B1["ユースケース実行の問題"]
     B --> B2["トランザクション失敗"]
-    B --> B3["例: UserAlreadyExistsApplicationError, DataConsistencyError"]
+    B --> B3["例: UserAlreadyExistsApplicationError,<br/>DataConsistencyError"]
 
     C["システムエラー<br/>（インフラエラー）"] --> C1["回復困難なエラー"]
     C --> C2["外部依存の失敗"]
@@ -51,8 +53,11 @@ export class InvalidEmailError extends DomainError {}
 export class InvalidPasswordError extends DomainError {}
 export class InsufficientBalanceError extends DomainError {}
 export class InvalidOrderStatusError extends DomainError {}
-// 注意: ユーザーの重複チェックはリポジトリへの問い合わせを伴うため、
-// エンティティ単体では判定できないアプリケーション層の関心事（下記 UserAlreadyExistsApplicationError を参照）
+// 注意: ユーザーの重複チェックは
+// リポジトリへの問い合わせを伴うため、
+// エンティティ単体では判定できない。
+// アプリケーション層の関心事
+// （下記 UserAlreadyExistsApplicationError を参照）
 
 // domain/entities/User.ts
 export class User {
@@ -173,8 +178,10 @@ export class UserController {
 
   private handleError(error: any, res: Response): void {
     // ビジネスエラー → 4xx
-    // 注意: ドメインエラーはユースケース内でアプリケーションエラーに変換済みのため、
-    // プレゼンテーション層ではアプリケーション層のエラークラスを判定する
+    // 注意: ドメインエラーはユースケース内で
+    // アプリケーションエラーに変換済みのため、
+    // プレゼンテーション層ではアプリケーション層の
+    // エラークラスを判定する
     if (error instanceof InvalidEmailApplicationError) {
       return res.status(400).json({
         error: error.message,

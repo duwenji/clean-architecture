@@ -117,8 +117,10 @@ export class User {
   private createdAt: Date;
 
   // ビジネスロジック
-  // 注意: パスワード照合は IPasswordHasher.compare() を使い Application 層（UseCase）が行う。
-  // Domain 層はハッシュ化済み値を保持するのみで、照合ロジックは持たない（詳細は 02-entity-design.md を参照）
+  // 注意: パスワード照合は IPasswordHasher.compare() を使い
+  // Application 層（UseCase）が行う。
+  // Domain 層はハッシュ化済み値を保持するのみで、
+  // 照合ロジックは持たない（詳細は 02-entity-design.md を参照）
   getHashedPassword(): string {
     return this.password.getHashedValue();
   }
@@ -197,7 +199,8 @@ export class RegisterUserUseCase {
     }
 
     // 2. パスワード強度チェック（ドメインルール）とハッシュ化
-    //    bcrypt 等の実装詳細は IPasswordHasher 経由で Infrastructure 層に隔離する。
+    //    bcrypt 等の実装詳細は IPasswordHasher 経由で
+    //    Infrastructure 層に隔離する。
     //    詳細は 02-entity-design.md / 03-usecase-design.md を参照
     Password.validateStrength(request.password);
     const hashedPassword = await this.passwordHasher.hash(request.password);
@@ -344,7 +347,8 @@ export class UserRepository implements IUserRepository {
 
   private mapRowToUser(row: any): User {
     // User のコンストラクタは private なので、DB からの復元は
-    // User.reconstruct() ファクトリメソッド経由で行う（詳細は 02-entity-design.md を参照）
+    // User.reconstruct() ファクトリメソッド経由で行う
+    // （詳細は 02-entity-design.md を参照）
     return User.reconstruct(
       row.id,
       new Email(row.email),
@@ -514,7 +518,11 @@ npm install -D jest @types/jest ts-jest
 npm install -D eslint @typescript-eslint/eslint-plugin
 
 # フォルダ構成作成
-mkdir -p src/{domain/{entities,interfaces,errors,services},application/{usecases,dtos,services},presentation/{controllers,middlewares,routes},infrastructure/{repositories,database,external-services,cryptography},config}
+mkdir -p src/domain/{entities,interfaces,errors,services}
+mkdir -p src/application/{usecases,dtos,services}
+mkdir -p src/presentation/{controllers,middlewares,routes}
+mkdir -p src/infrastructure/{repositories,database,external-services,cryptography}
+mkdir -p src/config
 mkdir -p tests/{unit,integration,e2e}
 ```
 

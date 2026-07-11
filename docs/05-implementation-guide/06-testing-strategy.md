@@ -85,9 +85,10 @@ describe("Email Value Object", () => {
 import { Password } from "../../../../src/domain/value-objects/Password";
 import { InvalidPasswordError } from "../../../../src/domain/errors/DomainError";
 
-// bcrypt 等でハッシュ化済みの文字列を模したテスト用ダミー値（60文字、実際のハッシュ化は
-// IPasswordHasher の実装＝Infrastructure 層が担当するため、Domain 層のテストではハッシュ化
-// 処理そのものは検証しない）
+// bcrypt 等でハッシュ化済みの文字列を模したテスト用ダミー値
+// （60文字、実際のハッシュ化は IPasswordHasher の実装＝
+// Infrastructure 層が担当するため、Domain 層のテストでは
+// ハッシュ化処理そのものは検証しない）
 const DUMMY_HASHED_PASSWORD = "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
 
 describe("Password Value Object", () => {
@@ -139,9 +140,10 @@ describe("Password Value Object", () => {
 import { User } from "../../../../src/domain/entities/User";
 import { Email } from "../../../../src/domain/value-objects/Email";
 
-// User.create / reconstruct はハッシュ化済みパスワードを受け取る（平文の強度チェックと
-// ハッシュ化は Application 層の UseCase が Password.validateStrength() と
-// IPasswordHasher.hash() で行う）ため、テストでは事前にハッシュ化済みの体で扱うダミー値を使う
+// User.create / reconstruct はハッシュ化済みパスワードを受け取る
+// （平文の強度チェックとハッシュ化は Application 層の UseCase が
+// Password.validateStrength() と IPasswordHasher.hash() で行う）
+// ため、テストでは事前にハッシュ化済みの体で扱うダミー値を使う
 const DUMMY_HASHED_PASSWORD = "$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
 
 describe("User Entity", () => {
@@ -188,7 +190,8 @@ describe("User Entity", () => {
       const user = await User.create(email, DUMMY_HASHED_PASSWORD, "John Doe");
 
       // User はハッシュ済みの値をそのまま保持するのみ。実際の照合は
-      // IPasswordHasher.compare() を使う Application 層の責務（LoginUserUseCase テスト参照）
+      // IPasswordHasher.compare() を使う Application 層の責務
+      // （LoginUserUseCase テスト参照）
       expect(user.getHashedPassword()).toBe(DUMMY_HASHED_PASSWORD);
     });
   });
@@ -415,7 +418,8 @@ describe("LoginUserUseCase", () => {
     passwordHasher = new MockPasswordHasher();
     useCase = new LoginUserUseCase(userRepository, tokenGenerator, passwordHasher);
 
-    // テスト用ユーザー作成（パスワードは IPasswordHasher で事前にハッシュ化してから渡す。
+    // テスト用ユーザー作成（パスワードは IPasswordHasher で
+    // 事前にハッシュ化してから渡す。
     // User エンティティ自身はもうハッシュ化・照合を行わない）
     const hashedPassword = await passwordHasher.hash("ValidPassword123");
     const user = await User.create(
@@ -691,7 +695,8 @@ describe("UserController", () => {
 
 ```
 □ Email 値オブジェクト - 有効/無効フォーマット
-□ Password 値オブジェクト - 強度チェック（validateStrength）、ハッシュ生成（fromHash）
+□ Password 値オブジェクト
+    - 強度チェック（validateStrength）、ハッシュ生成（fromHash）
 □ User エンティティ - 生成、ビジネスロジック
 □ エラークラス - 適切にスロー
 ```

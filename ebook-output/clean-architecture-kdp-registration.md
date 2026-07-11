@@ -1,6 +1,6 @@
 # KDP Registration Package: クリーンアーキテクチャ完全ガイド
 
-- Generated: 2026-07-05 21:21:41
+- Generated: 2026-07-06 21:20:33
 - Project: clean-architecture
 - Metadata: C:\Dev\tutorials\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.metadata.yaml
 - KDP Metadata: C:\Dev\tutorials\clean-architecture\.\.github\skills-config\ebook-build\clean-architecture.kdp.yaml

@@ -6,14 +6,16 @@
 
 ```mermaid
 flowchart TD
-    subgraph Before["❌ 従来の依存関係（上から下へ）<br/>問題：データベースを変更したら全て変更する必要"]
+    subgraph Before["❌ 従来の依存関係（上から下へ）"]
         direction TB
+        BNote["問題：データベースを変更したら<br/>全て変更する必要"]
         B1[UserService] -->|依存| B2[MySQLDatabase]
         B2 -->|依存| B3[MySQLDriver]
     end
 
-    subgraph After["✅ 逆転した依存関係（抽象化に依存）<br/>メリット：どのDBを使うか選べる"]
+    subgraph After["✅ 逆転した依存関係（抽象化に依存）"]
         direction TB
+        ANote["メリット：どのDBを使うか選べる"]
         A1[UserService] -->|依存| A2["Database インターフェース"]
         A3["MySQLDatabase or PostgreSQLDatabase"] -->|実装| A2
     end
@@ -193,7 +195,8 @@ export class MySQLUserRepository implements UserRepository {
 
   async saveUser(user: User): Promise<void> {
     await this.db.query(
-      'INSERT INTO users (id, email, password) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE email=?, password=?',
+      'INSERT INTO users (id, email, password) VALUES (?, ?, ?) ' +
+        'ON DUPLICATE KEY UPDATE email=?, password=?',
       [user.id, user.email, user.password, user.email, user.password]
     );
   }
@@ -215,7 +218,9 @@ export class PostgreSQLUserRepository implements UserRepository {
 
   async saveUser(user: User): Promise<void> {
     await this.db.query(
-      'INSERT INTO users (id, email, password) VALUES ($1, $2, $3) ON CONFLICT (id) DO UPDATE SET email=$2, password=$3',
+      'INSERT INTO users (id, email, password) ' +
+        'VALUES ($1, $2, $3) ' +
+        'ON CONFLICT (id) DO UPDATE SET email=$2, password=$3',
       [user.id, user.email, user.password]
     );
   }
@@ -385,7 +390,9 @@ describe('UserService with DIP', () => {
 
 ```mermaid
 flowchart TD
-    Others["実装に必要な他の4つの原則"] -->|支える| Top["DIP（依存性逆転の原則）"]
+    Others["実装に必要な他の4つの原則"]
+    Top["DIP（依存性逆転の原則）"]
+    Others -->|支える| Top
 
     SRP["SRP（単一責任）"] -->|変更理由が明確| OCP["OCP（開放閉鎖）"]
     OCP -->|拡張ポイントが定まる| LSP["LSP（リスコフ置換）"]

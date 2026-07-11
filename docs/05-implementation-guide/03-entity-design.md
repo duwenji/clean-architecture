@@ -188,8 +188,9 @@ export class Password {
 
   // 静的ファクトリメソッド: ハッシュ化済み文字列から生成
   // 注意: ハッシュ化そのもの（bcrypt 等）は IPasswordHasher の実装
-  // （Infrastructure 層の BcryptHasher）が行う。Password は「ハッシュ済みの値」を
-  // 保証するだけで、具体的なハッシュアルゴリズムには依存しない
+  // （Infrastructure 層の BcryptHasher）が行う。
+  // Password は「ハッシュ済みの値」を保証するだけで、
+  // 具体的なハッシュアルゴリズムには依存しない
   // （Dependency Rule: Domain 層は外部ライブラリに依存しない）
   static fromHash(hash: string): Password {
     return new Password(hash);
@@ -200,7 +201,8 @@ export class Password {
     return this.hashedValue;
   }
 
-  // ビジネスルール: パスワード強度チェック（平文に対する純粋な検証ロジック）
+  // ビジネスルール: パスワード強度チェック
+  // （平文に対する純粋な検証ロジック）
   // ハッシュ化前に、呼び出し側（UseCase）が実行する
   static validateStrength(password: string): void {
     const errors: string[] = [];
@@ -228,9 +230,12 @@ export class Password {
 // 詳細は 03-usecase-design.md を参照）
 //
 // 新規登録時（UseCase 内）
-// Password.validateStrength(plainPassword);                       // 1. 強度チェック（ドメインルール）
-// const hashedValue = await passwordHasher.hash(plainPassword);   // 2. ハッシュ化（IPasswordHasher）
-// const password1 = Password.fromHash(hashedValue);               // 3. 値オブジェクト生成
+// 1. 強度チェック（ドメインルール）
+// Password.validateStrength(plainPassword);
+// 2. ハッシュ化（IPasswordHasher）
+// const hashedValue = await passwordHasher.hash(plainPassword);
+// 3. 値オブジェクト生成
+// const password1 = Password.fromHash(hashedValue);
 
 // ログイン検証時（UseCase 内）
 // const matches = await passwordHasher.compare(plainPassword, user.getHashedPassword());
@@ -283,9 +288,12 @@ export class User {
   }
 
   // ファクトリメソッド1: 新規ユーザー作成
-  // 注意: plainPassword の強度チェック・ハッシュ化は Application 層（UseCase）の責務。
-  // UseCase が Password.validateStrength() と IPasswordHasher.hash() を実行した後、
-  // 生成済みのハッシュ文字列を hashedPassword として渡す（詳細は 03-usecase-design.md を参照）
+  // 注意: plainPassword の強度チェック・ハッシュ化は
+  // Application 層（UseCase）の責務。
+  // UseCase が Password.validateStrength() と
+  // IPasswordHasher.hash() を実行した後、
+  // 生成済みのハッシュ文字列を hashedPassword として渡す
+  // （詳細は 03-usecase-design.md を参照）
   static async create(
     email: Email,
     hashedPassword: string,
@@ -388,7 +396,8 @@ export class User {
   }
 
   // ハッシュ化済みパスワード取得（DB保存用、および Application 層で
-  // IPasswordHasher.compare() に渡す用。パスワード照合自体はここでは行わない）
+  // IPasswordHasher.compare() に渡す用。
+  // パスワード照合自体はここでは行わない）
   getHashedPassword(): string {
     return this.password.getHashedValue();
   }
@@ -457,8 +466,10 @@ export class User {
 async function exampleUserFlow() {
   try {
     // 1. 新規ユーザー作成
-    // 実務では、強度チェック（Password.validateStrength）とハッシュ化（IPasswordHasher.hash）は
-    // Application 層（UseCase）が行い、ハッシュ済み文字列を User.create() に渡す
+    // 実務では、強度チェック（Password.validateStrength）と
+    // ハッシュ化（IPasswordHasher.hash）は
+    // Application 層（UseCase）が行い、
+    // ハッシュ済み文字列を User.create() に渡す
     const email = new Email("john@example.com");
     Password.validateStrength("MyPassword123");
     const hashedPassword = "$2b$10$..."; // 実際は passwordHasher.hash() の戻り値

@@ -152,7 +152,8 @@ export class RegisterUserUseCase {
     const hashedPassword = await this.passwordHasher.hash(request.password);
 
     // 3. ドメインオブジェクト生成
-    // Email は値オブジェクトで validation 済み、Password はハッシュ済み文字列を渡してラップする
+    // Email は値オブジェクトで validation 済み、
+    // Password はハッシュ済み文字列を渡してラップする
     const email = new Email(request.email);
     const user = await User.create(email, hashedPassword, request.name);
 
